@@ -7,5 +7,8 @@ node_modules/
 # Build output
 dist/
 
+# Test coverage reports
+coverage/
+
 # Local tool configuration
 .mise.local.toml
