@@ -1,0 +1,8 @@
+# Secrets scanning rules (gitleaks-compatible).
+# Build output and dependencies are generated, not source: scanning them yields
+# false positives from bundled framework internals.
+title = "call-calendar"
+
+[allowlist]
+description = "Generated output and installed dependencies"
+paths = ['''node_modules/''', '''\.next/''', '''dist/''', '''pnpm-lock\.yaml''']
