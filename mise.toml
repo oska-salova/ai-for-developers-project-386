@@ -1,0 +1,45 @@
+# One toolchain for developers, git hooks and CI: `mise install`, then `mise run check`.
+# Versions are pinned; CI installs the same set from this file.
+[tools]
+node = "24.14.1"
+pnpm = "12.15.0"
+pkl = "0.32.2"
+hk = "2.9.0"
+oxlint = "1.90.0"
+"npm:oxfmt" = "0.75.0"
+"npm:knip" = "6.43.0"
+typos = "1.51.1"
+shellcheck = "0.11.0"
+jactionlint = "2.3.0"
+betterleaks = "1.9.0"
+osv-scanner = "2.7.0"
+"ubi:agent-sh/agnix" = "0.59.3"
+"npm:@commitlint/cli" = "21.2.4"
+
+[tasks.deps]
+description = "Install package dependencies from the lockfiles"
+run = [
+  "pnpm --dir backend install --frozen-lockfile",
+  "pnpm --dir frontend install --frozen-lockfile",
+]
+
+[tasks.setup]
+description = "Install dependencies and the git hooks"
+depends = ["deps"]
+run = "hk install"
+
+[tasks.check]
+description = "Run every check, the same set CI runs"
+run = "hk check --all"
+
+[tasks.security]
+description = "Slow checks: vulnerability database, full git history, online workflow checks"
+run = ["osv-scanner scan source -r .", "betterleaks git .", "jactionlint --online"]
+
+[tasks.fix]
+description = "Apply the automatic fixes"
+run = "hk fix --all"
+
+[tasks.commits]
+description = "Lint commit messages of a range (COMMITLINT_FROM required, COMMITLINT_TO defaults to HEAD)"
+run = "commitlint --from \"${COMMITLINT_FROM:?set COMMITLINT_FROM}\" --to \"${COMMITLINT_TO:-HEAD}\""
