@@ -1,42 +1,58 @@
 # Правила для AI-агентов
 
-## Перед завершением работы
+## Проект
 
-- `mise run check` должен проходить без ошибок — это тот же набор проверок, что запускает CI.
-- `mise run fix` применяет безопасные автоисправления (форматирование, автофиксы линтеров).
-- Первый запуск в новом окружении: `mise install`, затем `mise run setup`.
-- Инструменты живут в `mise.toml`, поэтому пакетные скрипты (`pnpm lint`, `pnpm format:check`) работают только внутри окружения mise: `mise exec -- pnpm --dir backend lint`.
+Сервис бронирования «Календарь звонков»: `backend/` — Express 5 + TypeScript (ESM), `frontend/` — Next.js 16 (App Router) + Tailwind 4 + shadcn/ui. Данные хранятся в памяти процесса, БД нет.
 
-## Сгенерированные файлы — не редактировать вручную
+## Окружение и команды
 
-- `frontend/AGENTS.md` — создаётся `next dev` из конфигурации Next.js.
-- `frontend/next-env.d.ts` — генерируется Next.js.
-- `frontend/.next/`, `backend/dist/`, `node_modules/` — артефакты сборки и установки.
+- Инструменты ставятся только через mise: `mise install`, затем `mise run setup` (зависимости + git-хуки `hk`).
+- Пакетные скрипты работают лишь внутри mise-окружения: `mise exec -- pnpm --dir backend lint`. Прямой `pnpm lint` даст `command not found`.
+- `mise run check` — обязательный гейт перед завершением работы (он же в CI): формат, oxlint, ESLint, типы, knip, тесты, секреты, typos, workflows, AGENTS.md.
+- `mise run fix` — безопасные автоисправления; `mise run test` — оба набора тестов; `mise run security` — osv-scanner, история git, online-правила workflows (медленно, есть в CI по расписанию).
+- Точечная проверка без прогона всего: `mise exec -- pnpm --dir backend test src/app.test.ts`, `mise exec -- pnpm --dir frontend test -- -t "часть названия"`, `mise exec -- hk run pre-push --all`.
+- Хуки: pre-commit — быстрые шаги по изменённым файлам, pre-push — весь набор. Хук можно обойти `--no-verify`, но CI запускает `mise run check`, так что обход бесполезен.
+
+## Структура и особенности
+
+- Это два независимых пакета, общего pnpm-workspace и корневого `package.json` нет: команды выполнять с `--dir backend` / `--dir frontend`, у каждого свой lockfile.
+- Порты: фронтенд 3000 (`next dev`/`next start`), бэкенд 3001 (`PORT`, по умолчанию 3001). CORS разрешает только `http://localhost:3000`; переопределяется `CORS_ORIGIN`.
+- `backend/src/app.ts` экспортирует `app` (middleware + роуты) — тесты импортируют его без запуска сервера; `backend/src/index.ts` только слушает порт. Новые роуты добавлять в `app.ts`.
+- Бэкенд — ESM + `moduleResolution: nodenext`: в относительных импортах обязательны `.js` (`import { app } from './app.js'`).
+- `pnpm dev` в бэкенде запускает `.ts` нативно через Node 24 (type stripping): `enum`, `namespace` и parameter properties не поддерживаются.
+- Сборка бэкенда идёт через `tsconfig.build.json` (тесты не попадают в `dist/`); `typecheck` проверяет и тесты.
+- Тёмная тема во фронтенде — класс `.dark` на `<html>` (shadcn), а не `prefers-color-scheme`.
+
+## Тесты
+
+- Vitest в обоих пакетах, покрытие v8 с порогом 60 % (lines/functions/branches/statements); `test:coverage` включён в `mise run check`.
+- Отчёты пишутся в `coverage/` — каталог в `.gitignore` и в ignore у ESLint/oxlint.
+- Фронтенд: jsdom + Testing Library, alias `@/*`; тесты рядом с кодом (`*.test.tsx`).
+
+## Линтеры и форматтер
+
+- Бэкенд — oxlint (`--deny-warnings`), фронтенд — ESLint `eslint-config-next` (`--max-warnings=0`); форматирование — oxfmt для обоих.
+- oxfmt намеренно пропускает `.github/workflows/hexlet-check.yml` и `pnpm-lock.yaml` — не «исправляйте» это.
+- Не отключайте правило, чтобы протолкнуть изменение. Исключение — только узкое (путь + правило), с причиной и датой пересмотра, например `.github/jactionlint.yaml`.
 
 ## Зависимости
 
-- Версии фиксируются точно, без `^`: добавляйте пакеты через `pnpm add -E` (`--save-exact`).
-- `.npmrc` с `save-exact=true` не работает в pnpm 12 — настройка из файла игнорируется, поэтому флаг нужен явно.
-- Зависимости ставятся внутри mise-окружения: `mise exec -- pnpm --dir backend add -E <пакет>`.
+- Версии фиксируются точно, без `^`: `mise exec -- pnpm --dir <пакет> add -E <пакет>`.
+- `save-exact=true` в `.npmrc` pnpm 12 игнорирует — файл с этой настройкой бесполезен.
+- `.github/dependabot.yml` держит мажорные апдейты `typescript` и `eslint` во фронтенде: typescript-eslint не поддерживает TS 7, а eslint-config-next требует eslint 9.
 
 ## UI-компоненты
 
-- `frontend/src/components/ui/*` — вендорный код shadcn/ui: добавляйте через `pnpm dlx shadcn@latest add <component>`, вручную правьте только осознанно.
-- Их экспорты не проверяются knip (исключение с причиной в `frontend/knip.config.ts`), потому что берём компоненты по мере надобности.
+- `frontend/src/components/ui/*` — вендорный shadcn/ui: добавляйте через `mise exec -- pnpm dlx shadcn@latest add <component>`, руками правьте осознанно.
+- Не добавляйте пакет `shadcn` в зависимости ради его Tailwind-CSS: он тянет `deepmerge@4.3.1` с неустранённым advisory, и osv-scanner валит `security`. Нужные кастомные варианты добавляйте локально.
+- knip не проверяет экспорты этих файлов (исключение с причиной в `frontend/knip.config.ts`).
 
-## Правила линтеров
+## Не трогать
 
-- Не отключайте правило, чтобы «протолкнуть» изменение.
-- Исключение допускается только узкое: один путь и одно правило, с причиной и датой пересмотра (см. `.github/jactionlint.yaml`).
-- Изменение исключений — решение человека, а не автоматическая правка.
+- `.github/workflows/hexlet-check.yml` — генерируется Хекслетом, помечен «DO NOT DELETE OR EDIT»; переименование репозитория тоже ломает проверку.
+- `frontend/AGENTS.md` создаётся `next dev` и перезаписывается при каждом запуске; `frontend/next-env.d.ts` генерируется Next.js.
+- Артефакты `frontend/.next/`, `frontend/coverage/`, `backend/dist/`, `node_modules/` — не редактировать и не коммитить.
 
-## Команды
+## Коммиты
 
-| Команда             | Назначение                                                                  |
-| ------------------- | --------------------------------------------------------------------------- |
-| `mise run check`    | все проверки (формат, линтеры, типы, knip, секреты, AGENTS.md, workflows)   |
-| `mise run fix`      | безопасные автоисправления                                                  |
-| `mise run test`     | оба набора тестов с порогами покрытия                                       |
-| `mise run security` | медленные проверки: база уязвимостей, история git, online-правила workflows |
-| `mise run deps`     | установка зависимостей обоих пакетов из lockfile                            |
-| `mise run commits`  | проверка сообщений коммитов в диапазоне (`COMMITLINT_FROM`)                 |
+- Conventional Commits обязательны: commit-msg хук и CI диапазона PR. Разрешённые типы: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`.
