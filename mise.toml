@@ -32,6 +32,10 @@ run = "hk install"
 description = "Run every check, the same set CI runs"
 run = "hk check --all"
 
+[tasks.test]
+description = "Run both test suites with the coverage thresholds"
+run = ["pnpm --dir backend test:coverage", "pnpm --dir frontend test:coverage"]
+
 [tasks.security]
 description = "Slow checks: vulnerability database, full git history, online workflow checks"
 run = ["osv-scanner scan source -r .", "betterleaks git .", "jactionlint --online"]

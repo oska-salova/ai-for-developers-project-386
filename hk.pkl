@@ -40,6 +40,10 @@ local all = (fast) {
         glob = List("backend/src/**/*.ts", "frontend/src/**/*.ts", "frontend/src/**/*.tsx", "**/package.json", "**/knip.json")
         check = "knip -D backend && knip -D frontend"
     }
+    ["tests"] {
+        glob = List("backend/src/**/*.ts", "frontend/src/**/*.ts", "frontend/src/**/*.tsx", "**/package.json", "**/vitest.config.*")
+        check = "pnpm --dir backend test:coverage && pnpm --dir frontend test:coverage"
+    }
     ["agents"] {
         glob = List("AGENTS.md", "frontend/AGENTS.md")
         check = "agnix --strict ."
