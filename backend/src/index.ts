@@ -1,9 +1,9 @@
-import cors from 'cors';
-import express from 'express';
+import cors from "cors";
+import express from "express";
 
 const app = express();
 const port = Number(process.env.PORT ?? 3001);
-const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:3000';
+const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
 
 app.use(
   cors({
@@ -14,8 +14,8 @@ app.use(
 );
 app.use(express.json());
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok" });
 });
 
 app.listen(port, () => {

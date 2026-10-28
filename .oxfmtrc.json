@@ -1,0 +1,9 @@
+{
+  "ignorePatterns": [
+    ".github/workflows/hexlet-check.yml",
+    "**/pnpm-lock.yaml",
+    "**/dist/**",
+    "**/.next/**",
+    "**/node_modules/**"
+  ]
+}
