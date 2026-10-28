@@ -8,5 +8,5 @@
     "correctness": "error",
     "suspicious": "warn"
   },
-  "ignorePatterns": ["**/dist/**", "**/.next/**", "**/node_modules/**"]
+  "ignorePatterns": ["**/dist/**", "**/.next/**", "**/node_modules/**", "**/coverage/**"]
 }
