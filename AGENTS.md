@@ -47,6 +47,12 @@
 - Не добавляйте пакет `shadcn` в зависимости ради его Tailwind-CSS: он тянет `deepmerge@4.3.1` с неустранённым advisory, и osv-scanner валит `security`. Нужные кастомные варианты добавляйте локально.
 - knip не проверяет экспорты этих файлов (исключение с причиной в `frontend/knip.config.ts`).
 
+## Скиллы агентов
+
+- `.agents/skills/*` — вендорные скиллы из [mattpocock/skills](https://github.com/mattpocock/skills), ставятся командой `npx skills@latest add mattpocock/skills` (версии — в `skills-lock.json`). Руками не правим: обновление перезапишет файлы.
+- `.agents/` исключён из oxfmt (`.oxfmtrc.json`) и typos (`.typos.toml`), потому что это чужой текст «как есть»; остальные проверки (`secrets`, `knip`, тесты) его не касаются.
+- Один раз на репозиторий имеет смысл прогнать скилл `/setup-matt-pocock-skills`: он спрашивает трекер задач, метки для `/triage` и место для доков.
+
 ## Не трогать
 
 - `.github/workflows/hexlet-check.yml` — генерируется Хекслетом, помечен «DO NOT DELETE OR EDIT»; переименование репозитория тоже ломает проверку.

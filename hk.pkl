@@ -19,7 +19,7 @@ local fast = new Mapping<String, Step> {
     }
     ["typos"] {
         glob = List("**/*")
-        check = "typos {{files}}"
+        check = "typos --force-exclude {{files}}"
     }
     ["secrets"] {
         glob = List("**/*")
