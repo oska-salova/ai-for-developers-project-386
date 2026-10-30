@@ -51,7 +51,21 @@
 
 - `.agents/skills/*` — вендорные скиллы из [mattpocock/skills](https://github.com/mattpocock/skills), ставятся командой `npx skills@latest add mattpocock/skills` (версии — в `skills-lock.json`). Руками не правим: обновление перезапишет файлы.
 - `.agents/` исключён из oxfmt (`.oxfmtrc.json`) и typos (`.typos.toml`), потому что это чужой текст «как есть»; остальные проверки (`secrets`, `knip`, тесты) его не касаются.
-- Один раз на репозиторий имеет смысл прогнать скилл `/setup-matt-pocock-skills`: он спрашивает трекер задач, метки для `/triage` и место для доков.
+- Сетап скиллов уже выполнен — см. раздел «Agent skills» ниже. Повторно запускать `/setup-matt-pocock-skills` есть смысл только при смене трекера задач или полной перенастройке.
+
+## Agent skills
+
+### Issue tracker
+
+Задачи и спеки живут в GitHub Issues репозитория `oska-salova/ai-for-developers-project-386`, работа через `gh` CLI. См. `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Пять канонических ролей с дефолтными именами меток: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. См. `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` и `docs/adr/` в корне репозитория. См. `docs/agents/domain.md`.
 
 ## Не трогать
 
