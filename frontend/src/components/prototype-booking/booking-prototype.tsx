@@ -1,9 +1,10 @@
 "use client";
 
-// ПРОТОТИП (#15) — три варианта мастера записи на существующем маршруте
-// /booking, переключаются через ?variant=A|B|C. Состояния (загрузка, пусто,
+// ПРОТОТИП (#15) — варианты мастера записи на существующем маршруте
+// /booking, переключаются через ?variant=A|B|C|D. Состояния (загрузка, пусто,
 // конфликт, ошибки полей, успех) — через ?state=…, чтобы их можно было
-// показать владельцу проекта без прохода всего сценария.
+// показать владельцу проекта без прохода всего сценария. D — микс A и B,
+// выбранный на просмотре.
 
 import { useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -12,8 +13,10 @@ import { PrototypeBar } from "./prototype-bar";
 import { VariantA } from "./variant-a";
 import { VariantB } from "./variant-b";
 import { VariantC } from "./variant-c";
+import { VariantD } from "./variant-d";
 
 const VARIANTS = [
+  { key: "D", name: "Карточка + полоса дней", component: VariantD },
   { key: "A", name: "Карточка-визард", component: VariantA },
   { key: "B", name: "Одностраничная доска", component: VariantB },
   { key: "C", name: "Диалог", component: VariantC },
@@ -23,7 +26,7 @@ export function BookingPrototype() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const variantKey = (searchParams.get("variant") ?? "A").toUpperCase();
+  const variantKey = (searchParams.get("variant") ?? "D").toUpperCase();
   const variant = VARIANTS.find((item) => item.key === variantKey) ?? VARIANTS[0];
   const stateParam = searchParams.get("state") ?? "normal";
   const scenario = SCENARIOS.find((item) => item.value === stateParam)?.value ?? "normal";
