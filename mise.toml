@@ -36,6 +36,10 @@ run = "hk check --all"
 description = "Run both test suites with the coverage thresholds"
 run = ["pnpm --dir backend test:coverage", "pnpm --dir frontend test:coverage"]
 
+[tasks.e2e]
+description = "Build the frontend and run the Playwright tests against it"
+run = "pnpm --dir frontend e2e"
+
 [tasks.security]
 description = "Slow checks: vulnerability database, full git history, online workflow checks"
 run = ["osv-scanner scan source -r .", "betterleaks git .", "jactionlint --online"]

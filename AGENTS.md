@@ -10,6 +10,7 @@
 - Пакетные скрипты работают лишь внутри mise-окружения: `mise exec -- pnpm --dir backend lint`. Прямой `pnpm lint` даст `command not found`.
 - `mise run check` — обязательный гейт перед завершением работы (он же в CI): формат, oxlint, ESLint, типы, knip, тесты, секреты, typos, workflows, AGENTS.md.
 - `mise run fix` — безопасные автоисправления; `mise run test` — оба набора тестов; `mise run security` — osv-scanner, история git, online-правила workflows (медленно, есть в CI по расписанию).
+- `mise run e2e` — сборка фронтенда и Playwright на Chromium. В `mise run check` не входит: гейт должен оставаться быстрым, а e2e живёт отдельным job в CI. Перед первым запуском локально: `mise exec -- pnpm --dir frontend exec playwright install chromium`.
 - Точечная проверка без прогона всего: `mise exec -- pnpm --dir backend test src/app.test.ts`, `mise exec -- pnpm --dir frontend test -- -t "часть названия"`, `mise exec -- hk run pre-push --all`.
 - Хуки: pre-commit — быстрые шаги по изменённым файлам, pre-push — весь набор. Хук можно обойти `--no-verify`, но CI запускает `mise run check`, так что обход бесполезен.
 
@@ -28,6 +29,7 @@
 - Vitest в обоих пакетах, покрытие v8 с порогом 60 % (lines/functions/branches/statements); `test:coverage` включён в `mise run check`.
 - Отчёты пишутся в `coverage/` — каталог в `.gitignore` и в ignore у ESLint/oxlint.
 - Фронтенд: jsdom + Testing Library, alias `@/*`; тесты рядом с кодом (`*.test.tsx`).
+- E2E: Playwright в `frontend/e2e` (`*.spec.ts`), только Chromium, запускается против production-сборки (`next build && next start`). Спеки исключены из Vitest; покрытие v8 считает `src/**/*.tsx` без вендорного `src/components/ui` и тестов.
 
 ## Линтеры и форматтер
 

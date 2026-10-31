@@ -50,6 +50,31 @@ jobs:
           COMMITLINT_FROM: ${{ github.event.pull_request.base.sha }}
           COMMITLINT_TO: ${{ github.event.pull_request.head.sha }}
 
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup mise
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: mise run deps
+
+      - name: Install Chromium for Playwright
+        run: mise exec -- pnpm --dir frontend exec playwright install --with-deps chromium
+
+      # The Playwright config builds the frontend and starts it on port 3000.
+      - name: Run end-to-end tests
+        run: mise run e2e
+
   security:
     name: Security
     runs-on: ubuntu-latest
