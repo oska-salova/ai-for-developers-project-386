@@ -22,6 +22,10 @@ export default defineConfig({
         "src/**/*.test.tsx",
         // Vendored shadcn components expose more API than the app uses.
         "src/components/ui/**",
+        // Прототип мастера записи живёт только на ветке prototype/booking-wizard
+        // (#15): тестов у него нет по определению, выбранный вариант
+        // переписывается в настоящий маршрут уже с тестами.
+        "src/components/prototype-booking/**",
       ],
       thresholds: {
         lines: 60,
