@@ -8,7 +8,7 @@
 
 - Инструменты ставятся только через mise: `mise install`, затем `mise run setup` (зависимости + git-хуки `hk`).
 - Пакетные скрипты работают лишь внутри mise-окружения: `mise exec -- pnpm --dir backend lint`. Прямой `pnpm lint` даст `command not found`.
-- `mise run check` — обязательный гейт перед завершением работы (он же в CI): формат, oxlint, ESLint, типы, knip, тесты, секреты, typos, workflows, AGENTS.md.
+- `mise run check` — обязательный локальный гейт перед завершением работы: формат, oxlint, ESLint, типы, knip, тесты, секреты, typos, workflows, AGENTS.md. CI запускает его же плюс отдельные джобы End-to-end и Security.
 - `mise run fix` — безопасные автоисправления; `mise run test` — оба набора тестов; `mise run security` — osv-scanner, история git, online-правила workflows (медленно, есть в CI по расписанию).
 - `mise run e2e` — сборка фронтенда и Playwright на Chromium. В `mise run check` не входит: гейт должен оставаться быстрым, а e2e живёт отдельным job в CI. Перед первым запуском локально: `mise exec -- pnpm --dir frontend exec playwright install chromium`.
 - Точечная проверка без прогона всего: `mise exec -- pnpm --dir backend test src/app.test.ts`, `mise exec -- pnpm --dir frontend test -- -t "часть названия"`, `mise exec -- hk run pre-push --all`.
@@ -23,12 +23,13 @@
 - `pnpm dev` в бэкенде запускает `.ts` нативно через Node 24 (type stripping): `enum`, `namespace` и parameter properties не поддерживаются.
 - Сборка бэкенда идёт через `tsconfig.build.json` (тесты не попадают в `dist/`); `typecheck` проверяет и тесты.
 - Тёмная тема во фронтенде — класс `.dark` на `<html>` (shadcn), а не `prefers-color-scheme`.
+- Во фронтенде включён `cacheComponents`: `new Date()`, `Math.random()` и `crypto.randomUUID()` в серверных компонентах ломают пререндер при `next build`. Значения времени фиксируйте на сборке через `env` в `next.config.ts` (пример — `NEXT_PUBLIC_BUILD_YEAR`) или рендерите участок по запросу в `<Suspense>` с `await connection()`.
 
 ## Тесты
 
 - Vitest в обоих пакетах, покрытие v8 с порогом 60 % (lines/functions/branches/statements); `test:coverage` включён в `mise run check`.
 - Отчёты пишутся в `coverage/` — каталог в `.gitignore` и в ignore у ESLint/oxlint.
-- Фронтенд: jsdom + Testing Library, alias `@/*`; тесты рядом с кодом (`*.test.tsx`).
+- Фронтенд: jsdom + Testing Library, alias `@/*`; тесты рядом с кодом (`*.test.tsx`). Маршрутные тесты, проверяющие несколько страниц сразу, живут в `src/app/`.
 - E2E: Playwright в `frontend/e2e` (`*.spec.ts`), только Chromium, запускается против production-сборки (`next build && next start`). Спеки исключены из Vitest; покрытие v8 считает `src/**/*.tsx` без вендорного `src/components/ui` и тестов.
 
 ## Линтеры и форматтер
@@ -42,6 +43,7 @@
 - Версии фиксируются точно, без `^`: `mise exec -- pnpm --dir <пакет> add -E <пакет>`.
 - `save-exact=true` в `.npmrc` pnpm 12 игнорирует — файл с этой настройкой бесполезен.
 - `.github/dependabot.yml` держит мажорные апдейты `typescript` и `eslint` во фронтенде: typescript-eslint не поддерживает TS 7, а eslint-config-next требует eslint 9.
+- После изменения зависимостей запускайте `mise run security` перед PR: `check` уязвимости не сканирует, а джоб Security в CI валит сборку на свежих advisory (так всплыл `minimatch` GHSA-g3hv-75wg-m249).
 
 ## UI-компоненты
 
@@ -57,17 +59,9 @@
 
 ## Agent skills
 
-### Issue tracker
-
-Задачи и спеки живут в GitHub Issues репозитория `oska-salova/ai-for-developers-project-386`, работа через `gh` CLI. См. `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Пять канонических ролей с дефолтными именами меток: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. См. `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context: `GLOSSARY.md` и `docs/adr/` в корне репозитория. См. `docs/agents/domain.md`.
+- Трекер задач — GitHub Issues репозитория `oska-salova/ai-for-developers-project-386`, работа через `gh` CLI: `docs/agents/issue-tracker.md`.
+- Метки триажа — пять канонических ролей: `docs/agents/triage-labels.md`.
+- Доменные доки — single-context, `GLOSSARY.md` и `docs/adr/` в корне: `docs/agents/domain.md`.
 
 ## Не трогать
 
