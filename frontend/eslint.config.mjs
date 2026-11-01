@@ -16,7 +16,41 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "test-results/**",
     "playwright-report/**",
+    // Generated from TypeSpec by `mise run contract:build`; never edited by hand.
+    "src/lib/api/generated/**",
   ]),
+  {
+    // Every request goes through the generated SDK and the thin module in
+    // src/lib/api.ts. Reaching for an HTTP client directly is a contract
+    // violation, so both literals and imports are banned here.
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-globals": [
+        "error",
+        {
+          name: "fetch",
+          message: "Call the backend through the generated SDK in src/lib/api.ts.",
+        },
+        {
+          name: "XMLHttpRequest",
+          message: "Call the backend through the generated SDK in src/lib/api.ts.",
+        },
+      ],
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            { name: "axios", message: "Call the backend through the generated SDK." },
+            { name: "ofetch", message: "Call the backend through the generated SDK." },
+            { name: "ky", message: "Call the backend through the generated SDK." },
+            { name: "got", message: "Call the backend through the generated SDK." },
+            { name: "node:http", message: "Call the backend through the generated SDK." },
+            { name: "node:https", message: "Call the backend through the generated SDK." },
+          ],
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

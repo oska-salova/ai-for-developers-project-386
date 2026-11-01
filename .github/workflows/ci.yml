@@ -17,18 +17,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Checks
+  verify:
+    name: Verify
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          # commitlint compares against the pull request base, which a shallow
-          # clone does not contain.
-          fetch-depth: 0
 
       # Installs the tools pinned in mise.toml — the same ones used locally.
       - name: Setup mise
@@ -36,34 +33,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: mise run deps
-
-      # Runs the formatter, linters, type checks, knip, secret scan and agent rules.
-      - name: Run checks
-        run: mise run check
-
-      - name: Lint commit messages
+      # Cheap and independent of the code: fail on a non-Conventional PR title
+      # before the heavy steps run. Only the title is checked, not `(#N)`.
+      - name: Lint pull request title
         if: github.event_name == 'pull_request'
-        run: mise run commits
+        run: printf '%s\n' "$PR_TITLE" | commitlint
         env:
-          COMMITLINT_FROM: ${{ github.event.pull_request.base.sha }}
-          COMMITLINT_TO: ${{ github.event.pull_request.head.sha }}
-
-  e2e:
-    name: End-to-end
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Setup mise
-        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
 
       - name: Install dependencies
         run: mise run deps
@@ -71,9 +47,10 @@ jobs:
       - name: Install Chromium for Playwright
         run: mise exec -- pnpm --dir frontend exec playwright install --with-deps chromium
 
-      # The Playwright config builds the frontend and starts it on port 3000.
-      - name: Run end-to-end tests
-        run: mise run e2e
+      # One command for both locally and in CI: contract drift, SDK-only audit,
+      # format, linters, types, knip, tests and the browser scenario.
+      - name: Run verify
+        run: mise run verify
 
   security:
     name: Security

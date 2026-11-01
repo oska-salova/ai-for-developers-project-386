@@ -29,6 +29,16 @@ updates:
       - dependency-name: eslint
         update-types: ["version-update:semver-major"]
 
+  - package-ecosystem: npm
+    directory: /contract
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      contract:
+        patterns: ["*"]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

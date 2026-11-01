@@ -6,7 +6,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
-      exclude: ["src/**/*.test.ts"],
+      // Generated types drift-check in `contract:check` instead of counting here.
+      exclude: ["src/**/*.test.ts", "src/generated/**"],
       thresholds: {
         lines: 60,
         functions: 60,

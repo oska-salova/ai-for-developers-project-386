@@ -19,7 +19,24 @@ git clone https://github.com/oska-salova/ai-for-developers-project-386.git
 cd ai-for-developers-project-386
 ```
 
-Переменные окружения не требуются: данные хранятся в памяти процесса.
+Переменные окружения не обязательны: данные хранятся в памяти процесса, адрес API и CORS
+имеют дефолты для локального запуска.
+
+## Запуск
+
+```bash
+mise run setup
+mise exec -- pnpm --dir backend dev          # пустое хранилище
+mise exec -- pnpm --dir backend dev:seeded   # с типом встречи «Кофе с гостем»
+mise exec -- pnpm --dir frontend dev
+```
+
+Фронтенд — http://localhost:3000, бэкенд — http://localhost:3001. `NEXT_PUBLIC_API_URL`
+переопределяет адрес API (по умолчанию `http://localhost:3001`), `CORS_ORIGIN` — разрешённый
+origin фронтенда.
+
+Контракт API описан на TypeSpec в `contract/`: `mise run contract:build` генерирует OpenAPI,
+SDK и типы бэкенда, `mise run contract:check` проверяет, что сгенерированное закоммичено.
 
 ## Использование
 
