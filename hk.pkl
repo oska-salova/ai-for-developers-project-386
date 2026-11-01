@@ -52,7 +52,11 @@ local all = (fast) {
 
 local commitMsg = new Mapping<String, Step> {
     ["commitlint"] {
-        check = "commitlint --edit {{commit_msg_file}}"
+        // The commit message path is quoted: repository paths may contain
+        // spaces (this checkout lives under "AI course"), and hk substitutes
+        // the placeholder verbatim.
+
+        check = "commitlint --edit \"{{commit_msg_file}}\""
     }
 }
 
