@@ -111,6 +111,23 @@
       }
     },
     "/api/meetings": {
+      "get": {
+        "operationId": "Meetings_list",
+        "description": "Предстоящие встречи владельца, без параметров.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ со списком предстоящих встреч.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeetingList"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "operationId": "Meetings_create",
         "description": "Запись гостя на свободный слот.",
@@ -332,6 +349,25 @@
           "not": {}
         },
         "description": "Тело успешного ответа на запись гостя."
+      },
+      "MeetingList": {
+        "type": "object",
+        "required": [
+          "meetings"
+        ],
+        "properties": {
+          "meetings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Meeting"
+            },
+            "description": "Предстоящие встречи по возрастанию старта."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Ответ со списком предстоящих встреч владельца."
       },
       "MeetingType": {
         "type": "object",

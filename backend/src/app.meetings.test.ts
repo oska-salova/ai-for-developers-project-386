@@ -147,6 +147,141 @@ describe("запись гостя: POST /api/meetings", () => {
   });
 });
 
+interface SeedMeeting {
+  type: "coffee" | "project";
+  start: string;
+  guestName?: string;
+  guestEmail?: string;
+}
+
+/** Builds an app whose store already holds the given meetings. */
+function makeListApp(seed: readonly SeedMeeting[] = []) {
+  const store = createStore();
+  const coffee = store.createMeetingType({
+    name: "Кофе с гостем",
+    description: "Короткий разговор о задаче",
+    durationMinutes: 30,
+  });
+  const project = store.createMeetingType({
+    name: "Созвон по проекту",
+    description: "Разбор задач на неделю",
+    durationMinutes: 60,
+  });
+  const typeIds = { coffee: coffee.id, project: project.id };
+
+  for (const [index, item] of seed.entries()) {
+    const added = store.addMeeting({
+      meetingTypeId: typeIds[item.type],
+      start: new Date(item.start),
+      guestName: item.guestName ?? `Гость ${index}`,
+      guestEmail: item.guestEmail ?? `guest${index}@example.com`,
+    });
+
+    if (!added.ok) {
+      throw new Error(`Не удалось подготовить встречу: ${added.reason}`);
+    }
+  }
+
+  return { app: createApp({ store, now: () => now }), store, coffee, project };
+}
+
+describe("список встреч: GET /api/meetings", () => {
+  it("returns only upcoming meetings sorted by start with a nested type summary", async () => {
+    const { app, coffee, project } = makeListApp([
+      { type: "coffee", start: "2026-11-01T06:00:00.000Z" },
+      { type: "coffee", start: "2026-11-01T09:00:00.000Z" },
+      { type: "project", start: "2026-11-03T10:00:00.000Z" },
+      { type: "coffee", start: "2026-11-02T07:00:00.000Z" },
+    ]);
+
+    const response = await request(app).get("/api/meetings");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      meetings: [
+        {
+          id: expect.any(String),
+          start: "2026-11-02T07:00:00.000Z",
+          guestName: "Гость 3",
+          guestEmail: "guest3@example.com",
+          meetingType: {
+            id: coffee.id,
+            name: "Кофе с гостем",
+            durationMinutes: 30,
+          },
+        },
+        {
+          id: expect.any(String),
+          start: "2026-11-03T10:00:00.000Z",
+          guestName: "Гость 2",
+          guestEmail: "guest2@example.com",
+          meetingType: {
+            id: project.id,
+            name: "Созвон по проекту",
+            durationMinutes: 60,
+          },
+        },
+      ],
+    });
+  });
+
+  it("does not include a meeting that starts exactly at the current moment", async () => {
+    const { app } = makeListApp([{ type: "coffee", start: now.toISOString() }]);
+
+    const response = await request(app).get("/api/meetings");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ meetings: [] });
+  });
+
+  it("returns an empty list when nothing is booked", async () => {
+    const { app } = makeListApp();
+
+    const response = await request(app).get("/api/meetings");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ meetings: [] });
+  });
+
+  it("reads the current moment exactly once per request", async () => {
+    const store = createStore();
+    store.createMeetingType({ name: "Кофе с гостем", description: "", durationMinutes: 30 });
+    let calls = 0;
+    const app = createApp({
+      store,
+      now: () => {
+        calls += 1;
+
+        return now;
+      },
+    });
+
+    await request(app).get("/api/meetings");
+
+    expect(calls).toBe(1);
+  });
+
+  it("skips a meeting whose type is unknown, since it has no summary", async () => {
+    const store = createStore({
+      meetings: [
+        {
+          id: "orphan",
+          meetingTypeId: "missing",
+          start: new Date("2026-11-02T07:00:00.000Z"),
+          guestName: "Гость",
+          guestEmail: "guest@example.com",
+        },
+      ],
+    });
+    const app = createApp({ store, now: () => now });
+
+    const response = await request(app).get("/api/meetings");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ meetings: [] });
+  });
+});
+
 describe("валидация полей встречи", () => {
   const typeId = "type-id";
 

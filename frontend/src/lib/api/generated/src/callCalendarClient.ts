@@ -11,6 +11,8 @@ import {
 import {
   create,
   type CreateOptions,
+  list,
+  type ListOptions,
 } from "./api/meetingsClient/meetingsClientOperations.js";
 import {
   createMeetingTypesClientContext,
@@ -20,8 +22,8 @@ import {
 import {
   create as create_2,
   type CreateOptions as CreateOptions_2,
-  list,
-  type ListOptions,
+  list as list_2,
+  type ListOptions as ListOptions_2,
   slots,
   type SlotsOptions,
 } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
@@ -46,8 +48,8 @@ export class MeetingTypesClient {
     this.#context = createMeetingTypesClientContext(options);
 
   }
-  async list(options?: ListOptions) {
-    return list(this.#context, options);
+  async list(options?: ListOptions_2) {
+    return list_2(this.#context, options);
   };
   async create(body: CreateMeetingTypeRequest, options?: CreateOptions_2) {
     return create_2(this.#context, body, options);
@@ -62,6 +64,9 @@ export class MeetingsClient {
     this.#context = createMeetingsClientContext(options);
 
   }
+  async list(options?: ListOptions) {
+    return list(this.#context, options);
+  };
   async create(body: CreateMeetingRequest, options?: CreateOptions) {
     return create(this.#context, body, options);
   }

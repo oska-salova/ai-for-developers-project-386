@@ -126,6 +126,19 @@ model Meeting {
   meetingType: MeetingTypeSummary;
 }
 
+/** Ответ со списком предстоящих встреч владельца. */
+model MeetingList {
+  /** Предстоящие встречи по возрастанию старта. */
+  meetings: Meeting[];
+}
+
+/** Успешный ответ со списком предстоящих встреч. */
+model MeetingsOkResponse {
+  @statusCode statusCode: 200;
+  @header("content-type") contentType: "application/json";
+  @body body: MeetingList;
+}
+
 /** Поля, которые гость присылает при записи на слот. */
 model CreateMeetingRequest {
   meetingTypeId: string;
@@ -170,6 +183,10 @@ model NotFoundResponse {
 
 @route("/api/meetings")
 interface Meetings {
+  /** Предстоящие встречи владельца, без параметров. */
+  @get
+  list(): MeetingsOkResponse;
+
   /** Запись гостя на свободный слот. */
   @post
   create(@body body: CreateMeetingRequest):

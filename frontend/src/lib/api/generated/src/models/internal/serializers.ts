@@ -6,6 +6,7 @@ import type {
   ErrorField,
   Meeting,
   MeetingCreatedBody,
+  MeetingList,
   MeetingType,
   MeetingTypeCreatedBody,
   MeetingTypeList,
@@ -73,6 +74,84 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   return jsonCreateMeetingTypeRequestToTransportTransform(payload)!;
 }export function createPayloadToTransport_2(payload: CreateMeetingRequest) {
   return jsonCreateMeetingRequestToTransportTransform(payload)!;
+}export function jsonMeetingListToTransportTransform(
+  input_?: MeetingList | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetings: jsonArrayMeetingToTransportTransform(input_.meetings)
+  }!;
+}export function jsonMeetingListToApplicationTransform(
+  input_?: any,
+): MeetingList {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetings: jsonArrayMeetingToApplicationTransform(input_.meetings)
+  }!;
+}export function jsonArrayMeetingToTransportTransform(
+  items_?: Array<Meeting> | null,
+): any {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonMeetingToTransportTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonArrayMeetingToApplicationTransform(
+  items_?: any,
+): Array<Meeting> {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonMeetingToApplicationTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonMeetingToTransportTransform(input_?: Meeting | null): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail,meetingType: jsonMeetingTypeSummaryToTransportTransform(input_.meetingType)
+  }!;
+}export function jsonMeetingToApplicationTransform(input_?: any): Meeting {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail,meetingType: jsonMeetingTypeSummaryToApplicationTransform(input_.meetingType)
+  }!;
+}export function jsonMeetingTypeSummaryToTransportTransform(
+  input_?: MeetingTypeSummary | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,durationMinutes: input_.durationMinutes
+  }!;
+}export function jsonMeetingTypeSummaryToApplicationTransform(
+  input_?: any,
+): MeetingTypeSummary {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,durationMinutes: input_.durationMinutes
+  }!;
 }export function jsonCreateMeetingRequestToTransportTransform(
   input_?: CreateMeetingRequest | null,
 ): any {
@@ -108,38 +187,6 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   }
     return {
     meeting: jsonMeetingToApplicationTransform(input_.meeting)
-  }!;
-}export function jsonMeetingToTransportTransform(input_?: Meeting | null): any {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    id: input_.id,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail,meetingType: jsonMeetingTypeSummaryToTransportTransform(input_.meetingType)
-  }!;
-}export function jsonMeetingToApplicationTransform(input_?: any): Meeting {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    id: input_.id,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail,meetingType: jsonMeetingTypeSummaryToApplicationTransform(input_.meetingType)
-  }!;
-}export function jsonMeetingTypeSummaryToTransportTransform(
-  input_?: MeetingTypeSummary | null,
-): any {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    id: input_.id,name: input_.name,durationMinutes: input_.durationMinutes
-  }!;
-}export function jsonMeetingTypeSummaryToApplicationTransform(
-  input_?: any,
-): MeetingTypeSummary {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    id: input_.id,name: input_.name,durationMinutes: input_.durationMinutes
   }!;
 }export function jsonErrorBodyEnvelopeToTransportTransform(
   input_?: ErrorBodyEnvelope | null,

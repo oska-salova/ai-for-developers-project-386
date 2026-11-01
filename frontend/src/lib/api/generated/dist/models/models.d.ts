@@ -3,22 +3,13 @@
  */
 export type String = string;
 /**
- * Поля, которые гость присылает при записи на слот.
+ * Ответ со списком предстоящих встреч владельца.
  */
-export interface CreateMeetingRequest {
-    meetingTypeId: string;
+export interface MeetingList {
     /**
-     * Мгновение начала в ISO 8601 UTC с суффиксом Z.
+     * Предстоящие встречи по возрастанию старта.
      */
-    start: string;
-    guestName: string;
-    guestEmail: string;
-}
-/**
- * Тело успешного ответа на запись гостя.
- */
-export interface MeetingCreatedBody {
-    meeting: Meeting;
+    meetings: Array<Meeting>;
 }
 /**
  * Забронированный интервал в календаре владельца.
@@ -58,6 +49,24 @@ export type Integer = number;
  * A numeric type
  */
 export type Numeric = number;
+/**
+ * Поля, которые гость присылает при записи на слот.
+ */
+export interface CreateMeetingRequest {
+    meetingTypeId: string;
+    /**
+     * Мгновение начала в ISO 8601 UTC с суффиксом Z.
+     */
+    start: string;
+    guestName: string;
+    guestEmail: string;
+}
+/**
+ * Тело успешного ответа на запись гостя.
+ */
+export interface MeetingCreatedBody {
+    meeting: Meeting;
+}
 /**
  * Единая рамка ошибок API.
  */

@@ -55,37 +55,43 @@ export function createPayloadToTransport(payload) {
 export function createPayloadToTransport_2(payload) {
     return jsonCreateMeetingRequestToTransportTransform(payload);
 }
-export function jsonCreateMeetingRequestToTransportTransform(input_) {
+export function jsonMeetingListToTransportTransform(input_) {
     if (!input_) {
         return input_;
     }
     return {
-        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
+        meetings: jsonArrayMeetingToTransportTransform(input_.meetings)
     };
 }
-export function jsonCreateMeetingRequestToApplicationTransform(input_) {
+export function jsonMeetingListToApplicationTransform(input_) {
     if (!input_) {
         return input_;
     }
     return {
-        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
+        meetings: jsonArrayMeetingToApplicationTransform(input_.meetings)
     };
 }
-export function jsonMeetingCreatedBodyToTransportTransform(input_) {
-    if (!input_) {
-        return input_;
+export function jsonArrayMeetingToTransportTransform(items_) {
+    if (!items_) {
+        return items_;
     }
-    return {
-        meeting: jsonMeetingToTransportTransform(input_.meeting)
-    };
+    const _transformedArray = [];
+    for (const item of items_ ?? []) {
+        const transformedItem = jsonMeetingToTransportTransform(item);
+        _transformedArray.push(transformedItem);
+    }
+    return _transformedArray;
 }
-export function jsonMeetingCreatedBodyToApplicationTransform(input_) {
-    if (!input_) {
-        return input_;
+export function jsonArrayMeetingToApplicationTransform(items_) {
+    if (!items_) {
+        return items_;
     }
-    return {
-        meeting: jsonMeetingToApplicationTransform(input_.meeting)
-    };
+    const _transformedArray = [];
+    for (const item of items_ ?? []) {
+        const transformedItem = jsonMeetingToApplicationTransform(item);
+        _transformedArray.push(transformedItem);
+    }
+    return _transformedArray;
 }
 export function jsonMeetingToTransportTransform(input_) {
     if (!input_) {
@@ -117,6 +123,38 @@ export function jsonMeetingTypeSummaryToApplicationTransform(input_) {
     }
     return {
         id: input_.id, name: input_.name, durationMinutes: input_.durationMinutes
+    };
+}
+export function jsonCreateMeetingRequestToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
+    };
+}
+export function jsonCreateMeetingRequestToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
+    };
+}
+export function jsonMeetingCreatedBodyToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meeting: jsonMeetingToTransportTransform(input_.meeting)
+    };
+}
+export function jsonMeetingCreatedBodyToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meeting: jsonMeetingToApplicationTransform(input_.meeting)
     };
 }
 export function jsonErrorBodyEnvelopeToTransportTransform(input_) {

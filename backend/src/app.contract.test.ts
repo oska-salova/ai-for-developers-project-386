@@ -217,6 +217,25 @@ describe("contract compliance", () => {
     ).rejects.toThrow();
   });
 
+  it("validates the 200 body of GET /api/meetings with upcoming meetings", async () => {
+    const { app, meetingTypeId } = makeMeetingsApp();
+
+    await request(app).post("/api/meetings").send(validMeeting(meetingTypeId));
+    const response = await request(app).get("/api/meetings");
+
+    expect(response.status).toBe(200);
+    await validateResponse("/api/meetings", "get", response.status, response.body);
+  });
+
+  it("validates the 200 body of GET /api/meetings when the list is empty", async () => {
+    const { app } = makeMeetingsApp();
+
+    const response = await request(app).get("/api/meetings");
+
+    expect(response.status).toBe(200);
+    await validateResponse("/api/meetings", "get", response.status, response.body);
+  });
+
   it("validates the 201 body of POST /api/meetings", async () => {
     const { app, meetingTypeId } = makeMeetingsApp();
 

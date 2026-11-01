@@ -95,6 +95,13 @@ export async function listSlots(meetingTypeId: string): Promise<SlotsEnvelope> {
   return unwrap(result);
 }
 
+/** The owner's upcoming meetings, sorted by start by the server. */
+export async function listMeetings(): Promise<Meeting[]> {
+  const result = await apiClient.meetingsClient.list();
+
+  return unwrap(result).meetings;
+}
+
 /** The fields the guest fills in when booking a slot. */
 export type NewMeetingInput = CreateMeetingRequest;
 

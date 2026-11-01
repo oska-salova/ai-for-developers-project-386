@@ -1,6 +1,15 @@
 import { MeetingsClientContext } from "./meetingsClientContext.js";
 import type { OperationOptions } from "../../helpers/interfaces.js";
-import { CreateMeetingRequest, type ErrorBodyEnvelope, type MeetingCreatedBody } from "../../models/models.js";
+import { CreateMeetingRequest, type ErrorBodyEnvelope, type MeetingCreatedBody, type MeetingList } from "../../models/models.js";
+export interface ListOptions extends OperationOptions {
+}
+/**
+ * Предстоящие встречи владельца, без параметров.
+ *
+ * @param {MeetingsClientContext} client
+ * @param {ListOptions} [options]
+ */
+export declare function list(client: MeetingsClientContext, options?: ListOptions): Promise<MeetingList>;
 export interface CreateOptions extends OperationOptions {
 }
 /**

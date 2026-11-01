@@ -1,6 +1,27 @@
 import { parse } from "uri-template";
 import { createRestError } from "../../helpers/error.js";
-import { jsonCreateMeetingRequestToTransportTransform, jsonErrorBodyEnvelopeToApplicationTransform, jsonMeetingCreatedBodyToApplicationTransform, } from "../../models/internal/serializers.js";
+import { jsonCreateMeetingRequestToTransportTransform, jsonErrorBodyEnvelopeToApplicationTransform, jsonMeetingCreatedBodyToApplicationTransform, jsonMeetingListToApplicationTransform, } from "../../models/internal/serializers.js";
+/**
+ * Предстоящие встречи владельца, без параметров.
+ *
+ * @param {MeetingsClientContext} client
+ * @param {ListOptions} [options]
+ */
+export async function list(client, options) {
+    const path = parse("/api/meetings").expand({});
+    const httpRequestOptions = {
+        headers: {},
+    };
+    const response = await client.pathUnchecked(path).get(httpRequestOptions);
+    if (typeof options?.operationOptions?.onResponse === "function") {
+        options?.operationOptions?.onResponse(response);
+    }
+    if (+response.status === 200 && response.headers["content-type"]?.includes("application/json")) {
+        return jsonMeetingListToApplicationTransform(response.body);
+    }
+    throw createRestError(response);
+}
+;
 /**
  * Запись гостя на свободный слот.
  *

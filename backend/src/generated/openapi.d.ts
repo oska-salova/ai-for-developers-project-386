@@ -46,7 +46,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** @description Предстоящие встречи владельца, без параметров. */
+        get: operations["Meetings_list"];
         put?: never;
         /** @description Запись гостя на свободный слот. */
         post: operations["Meetings_create"];
@@ -118,6 +119,13 @@ export interface components {
         /** @description Тело успешного ответа на запись гостя. */
         MeetingCreatedBody: {
             meeting: components["schemas"]["Meeting"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Ответ со списком предстоящих встреч владельца. */
+        MeetingList: {
+            /** @description Предстоящие встречи по возрастанию старта. */
+            meetings: components["schemas"]["Meeting"][];
         } & {
             [key: string]: unknown;
         };
@@ -287,6 +295,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
+        };
+    };
+    Meetings_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешный ответ со списком предстоящих встреч. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetingList"];
                 };
             };
         };

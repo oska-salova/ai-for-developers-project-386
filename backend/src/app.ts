@@ -28,6 +28,7 @@ type MeetingType = components["schemas"]["MeetingType"];
 type MeetingTypeListBody = components["schemas"]["MeetingTypeList"];
 type MeetingTypeCreatedBody = components["schemas"]["MeetingTypeCreatedBody"];
 type MeetingBody = components["schemas"]["Meeting"];
+type MeetingListBody = components["schemas"]["MeetingList"];
 type MeetingCreatedBody = components["schemas"]["MeetingCreatedBody"];
 type ErrorBodyEnvelope = components["schemas"]["ErrorBodyEnvelope"];
 type ErrorField = components["schemas"]["ErrorField"];
@@ -128,6 +129,27 @@ export function createApp({ store, now }: AppDependencies): Express {
       ),
       now: now(),
     });
+
+    res.status(200).json(body);
+  });
+
+  app.get("/api/meetings", (_req, res) => {
+    // The current moment is read once: the same instant filters every meeting.
+    const currentMoment = now();
+    const upcoming = store
+      .listMeetings()
+      .filter((meeting) => meeting.start.getTime() > currentMoment.getTime())
+      .toSorted((left, right) => left.start.getTime() - right.start.getTime());
+
+    const meetings = upcoming.flatMap((meeting) => {
+      const meetingType = store.findMeetingType(meeting.meetingTypeId);
+
+      // A meeting without a type cannot be produced by the API, and it has no
+      // summary to show; the slots engine skips such meetings too.
+      return meetingType === undefined ? [] : [meetingBody(meeting, meetingType)];
+    });
+
+    const body: MeetingListBody = { meetings };
 
     res.status(200).json(body);
   });

@@ -1,8 +1,8 @@
 import { createCallCalendarClientContext, } from "./api/callCalendarClientContext.js";
 import { createMeetingsClientContext, } from "./api/meetingsClient/meetingsClientContext.js";
-import { create, } from "./api/meetingsClient/meetingsClientOperations.js";
+import { create, list, } from "./api/meetingsClient/meetingsClientOperations.js";
 import { createMeetingTypesClientContext, } from "./api/meetingTypesClient/meetingTypesClientContext.js";
-import { create as create_2, list, slots, } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
+import { create as create_2, list as list_2, slots, } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
 export class CallCalendarClient {
     #context;
     meetingsClient;
@@ -21,7 +21,7 @@ export class MeetingTypesClient {
         this.#context = createMeetingTypesClientContext(options);
     }
     async list(options) {
-        return list(this.#context, options);
+        return list_2(this.#context, options);
     }
     ;
     async create(body, options) {
@@ -37,6 +37,10 @@ export class MeetingsClient {
     constructor(options) {
         this.#context = createMeetingsClientContext(options);
     }
+    async list(options) {
+        return list(this.#context, options);
+    }
+    ;
     async create(body, options) {
         return create(this.#context, body, options);
     }
