@@ -7,6 +7,16 @@
 Учебный проект Хекслета: https://ru.hexlet.io/programs/ai-for-developers
 Как это должно работать: https://files.hexlet.app/a/2ipc5m
 
+## Демо
+
+Приложение: <https://ai-for-developers-project-386-vq2v.onrender.com/>
+
+Сервис развёрнут на Render по free-тарифу: после простоя первый запрос может
+открываться дольше обычного.
+
+Render MCP не подключён: `mcp.render.com` недоступен из текущего региона,
+поэтому деплой и управление сервисом выполняются через дашборд Render.
+
 ## Стек
 
 - Frontend: Next.js 16, React, TypeScript
