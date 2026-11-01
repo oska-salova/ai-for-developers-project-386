@@ -9,9 +9,12 @@ import {
   type MeetingTypesClientOptions,
 } from "./api/meetingTypesClient/meetingTypesClientContext.js";
 import {
+  create,
+  type CreateOptions,
   list,
   type ListOptions,
 } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
+import type { CreateMeetingTypeRequest } from "./models/models.js";
 
 export class CallCalendarClient {
   #context: CallCalendarClientContext
@@ -29,5 +32,8 @@ export class MeetingTypesClient {
   }
   async list(options?: ListOptions) {
     return list(this.#context, options);
+  };
+  async create(body: CreateMeetingTypeRequest, options?: CreateOptions) {
+    return create(this.#context, body, options);
   }
 }

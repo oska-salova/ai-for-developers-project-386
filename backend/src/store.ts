@@ -5,7 +5,7 @@ import type { components } from "./generated/openapi.js";
 type MeetingType = components["schemas"]["MeetingType"];
 
 /** The fields the owner supplies when creating a meeting type. */
-interface NewMeetingType {
+export interface NewMeetingType {
   name: string;
   description: string;
   durationMinutes: number;

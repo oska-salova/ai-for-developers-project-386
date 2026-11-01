@@ -70,3 +70,16 @@ export async function listMeetingTypes() {
 
   return unwrap(result).meetingTypes;
 }
+
+/** The fields the owner fills in when creating a meeting type. */
+export interface NewMeetingTypeInput {
+  name: string;
+  description?: string;
+  durationMinutes: number;
+}
+
+export async function createMeetingType(input: NewMeetingTypeInput): Promise<MeetingType> {
+  const result = await apiClient.meetingTypesClient.create(input);
+
+  return unwrap(result).meetingType;
+}

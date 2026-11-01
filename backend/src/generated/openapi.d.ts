@@ -14,7 +14,8 @@ export interface paths {
         /** @description Список типов встреч владельца. */
         get: operations["MeetingTypes_list"];
         put?: never;
-        post?: never;
+        /** @description Создание типа встречи. */
+        post: operations["MeetingTypes_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -25,6 +26,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description Поля, которые владелец присылает при создании типа встречи. */
+        CreateMeetingTypeRequest: {
+            name: string;
+            description?: string;
+            /** Format: int32 */
+            durationMinutes: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** @description Машиночитаемый код и текст ошибки. */
         ErrorBody: {
             /** @description Один из кодов: validation_error, not_found, slot_conflict, internal_error. */
@@ -57,6 +67,12 @@ export interface components {
             description: string;
             /** Format: int32 */
             durationMinutes: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Тело успешного ответа на создание типа встречи. */
+        MeetingTypeCreatedBody: {
+            meetingType: components["schemas"]["MeetingType"];
         } & {
             [key: string]: unknown;
         };
@@ -95,6 +111,39 @@ export interface operations {
             };
             /** @description Ответ на неизвестный маршрут или отсутствующий ресурс. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
+        };
+    };
+    MeetingTypes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMeetingTypeRequest"];
+            };
+        };
+        responses: {
+            /** @description Успешный ответ на создание типа встречи. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetingTypeCreatedBody"];
+                };
+            };
+            /** @description Ответ на запрос, поля которого не прошли проверку. */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };

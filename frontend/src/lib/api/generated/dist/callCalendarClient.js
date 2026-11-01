@@ -1,6 +1,6 @@
 import { createCallCalendarClientContext, } from "./api/callCalendarClientContext.js";
 import { createMeetingTypesClientContext, } from "./api/meetingTypesClient/meetingTypesClientContext.js";
-import { list, } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
+import { create, list, } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
 export class CallCalendarClient {
     #context;
     meetingTypesClient;
@@ -16,5 +16,9 @@ export class MeetingTypesClient {
     }
     async list(options) {
         return list(this.#context, options);
+    }
+    ;
+    async create(body, options) {
+        return create(this.#context, body, options);
     }
 }

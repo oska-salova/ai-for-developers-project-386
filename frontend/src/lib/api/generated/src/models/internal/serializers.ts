@@ -1,8 +1,10 @@
 import type {
+  CreateMeetingTypeRequest,
   ErrorBody,
   ErrorBodyEnvelope,
   ErrorField,
   MeetingType,
+  MeetingTypeCreatedBody,
   MeetingTypeList,
 } from "../models.js";
 
@@ -59,6 +61,8 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   }
 
   return new Date(date * 1000);
+}export function createPayloadToTransport(payload: CreateMeetingTypeRequest) {
+  return jsonCreateMeetingTypeRequestToTransportTransform(payload)!;
 }export function jsonMeetingTypeListToTransportTransform(
   input_?: MeetingTypeList | null,
 ): any {
@@ -202,5 +206,41 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   }
     return {
     field: input_.field,message: input_.message
+  }!;
+}export function jsonCreateMeetingTypeRequestToTransportTransform(
+  input_?: CreateMeetingTypeRequest | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
+  }!;
+}export function jsonCreateMeetingTypeRequestToApplicationTransform(
+  input_?: any,
+): CreateMeetingTypeRequest {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
+  }!;
+}export function jsonMeetingTypeCreatedBodyToTransportTransform(
+  input_?: MeetingTypeCreatedBody | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingType: jsonMeetingTypeToTransportTransform(input_.meetingType)
+  }!;
+}export function jsonMeetingTypeCreatedBodyToApplicationTransform(
+  input_?: any,
+): MeetingTypeCreatedBody {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingType: jsonMeetingTypeToApplicationTransform(input_.meetingType)
   }!;
 }

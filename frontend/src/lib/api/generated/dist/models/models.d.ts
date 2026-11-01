@@ -67,3 +67,17 @@ export interface ErrorField {
      */
     message: string;
 }
+/**
+ * Поля, которые владелец присылает при создании типа встречи.
+ */
+export interface CreateMeetingTypeRequest {
+    name: string;
+    description?: string;
+    durationMinutes: number;
+}
+/**
+ * Тело успешного ответа на создание типа встречи.
+ */
+export interface MeetingTypeCreatedBody {
+    meetingType: MeetingType;
+}

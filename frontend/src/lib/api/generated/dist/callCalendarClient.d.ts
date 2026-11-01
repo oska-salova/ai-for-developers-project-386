@@ -1,6 +1,7 @@
 import { type CallCalendarClientOptions } from "./api/callCalendarClientContext.js";
 import { type MeetingTypesClientOptions } from "./api/meetingTypesClient/meetingTypesClientContext.js";
-import { type ListOptions } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
+import { type CreateOptions, type ListOptions } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
+import type { CreateMeetingTypeRequest } from "./models/models.js";
 export declare class CallCalendarClient {
     #private;
     meetingTypesClient: MeetingTypesClient;
@@ -9,5 +10,6 @@ export declare class CallCalendarClient {
 export declare class MeetingTypesClient {
     #private;
     constructor(options?: MeetingTypesClientOptions);
-    list(options?: ListOptions): Promise<import("./index.js").MeetingTypeList | import("./index.js").ErrorBodyEnvelope>;
+    list(options?: ListOptions): Promise<import("./models/models.js").MeetingTypeList | import("./models/models.js").ErrorBodyEnvelope>;
+    create(body: CreateMeetingTypeRequest, options?: CreateOptions): Promise<import("./models/models.js").ErrorBodyEnvelope | import("./models/models.js").MeetingTypeCreatedBody>;
 }

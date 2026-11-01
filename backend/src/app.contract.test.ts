@@ -91,6 +91,36 @@ describe("contract compliance", () => {
     await validateResponse("/api/meeting-types", "get", response.status, response.body);
   });
 
+  it("validates the 201 body of POST /api/meeting-types", async () => {
+    const response = await request(makeApp()).post("/api/meeting-types").send({
+      name: "Созвон по проекту",
+      description: "Разбор задач на неделю",
+      durationMinutes: 60,
+    });
+
+    expect(response.status).toBe(201);
+    await validateResponse("/api/meeting-types", "post", response.status, response.body);
+  });
+
+  it("validates the 400 body of POST /api/meeting-types with invalid fields", async () => {
+    const response = await request(makeApp())
+      .post("/api/meeting-types")
+      .send({ name: "  ", durationMinutes: 20 });
+
+    expect(response.status).toBe(400);
+    await validateResponse("/api/meeting-types", "post", response.status, response.body);
+  });
+
+  it("validates the 400 body of POST /api/meeting-types with a malformed JSON body", async () => {
+    const response = await request(makeApp())
+      .post("/api/meeting-types")
+      .set("content-type", "application/json")
+      .send('{"name": ');
+
+    expect(response.status).toBe(400);
+    await validateResponse("/api/meeting-types", "post", response.status, response.body);
+  });
+
   it("validates the 404 body of an unknown route", async () => {
     const response = await request(makeApp()).get("/api/unknown");
 

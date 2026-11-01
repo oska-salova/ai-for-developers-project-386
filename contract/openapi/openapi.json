@@ -33,11 +33,71 @@
             }
           }
         }
+      },
+      "post": {
+        "operationId": "MeetingTypes_create",
+        "description": "Создание типа встречи.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Успешный ответ на создание типа встречи.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeetingTypeCreatedBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ответ на запрос, поля которого не прошли проверку.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMeetingTypeRequest"
+              }
+            }
+          }
+        }
       }
     }
   },
   "components": {
     "schemas": {
+      "CreateMeetingTypeRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "durationMinutes"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Поля, которые владелец присылает при создании типа встречи."
+      },
       "ErrorBody": {
         "type": "object",
         "required": [
@@ -128,6 +188,21 @@
           "not": {}
         },
         "description": "Шаблон бронирования: что владелец предлагает гостю."
+      },
+      "MeetingTypeCreatedBody": {
+        "type": "object",
+        "required": [
+          "meetingType"
+        ],
+        "properties": {
+          "meetingType": {
+            "$ref": "#/components/schemas/MeetingType"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Тело успешного ответа на создание типа встречи."
       },
       "MeetingTypeList": {
         "type": "object",

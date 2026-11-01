@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MeetingType } from "@/lib/api";
 
@@ -18,9 +19,9 @@ export function MeetingTypesList({ meetingTypes }: { meetingTypes: MeetingType[]
             <CardHeader>
               <div className="flex items-start justify-between gap-3">
                 <CardTitle>{meetingType.name}</CardTitle>
-                <span className="inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                <Badge variant="secondary" className="shrink-0">
                   {meetingType.durationMinutes} мин
-                </span>
+                </Badge>
               </div>
             </CardHeader>
             {meetingType.description !== "" && (

@@ -43,11 +43,37 @@ model MeetingTypeList {
   meetingTypes: MeetingType[];
 }
 
+/** Поля, которые владелец присылает при создании типа встречи. */
+model CreateMeetingTypeRequest {
+  name: string;
+  description?: string;
+  durationMinutes: int32;
+}
+
+/** Тело успешного ответа на создание типа встречи. */
+model MeetingTypeCreatedBody {
+  meetingType: MeetingType;
+}
+
 /** Успешный ответ со списком типов встреч. */
 model MeetingTypesOkResponse {
   @statusCode statusCode: 200;
   @header("content-type") contentType: "application/json";
   @body body: MeetingTypeList;
+}
+
+/** Успешный ответ на создание типа встречи. */
+model MeetingTypeCreatedResponse {
+  @statusCode statusCode: 201;
+  @header("content-type") contentType: "application/json";
+  @body body: MeetingTypeCreatedBody;
+}
+
+/** Ответ на запрос, поля которого не прошли проверку. */
+model ValidationErrorResponse {
+  @statusCode statusCode: 400;
+  @header("content-type") contentType: "application/json";
+  @body body: ErrorBodyEnvelope;
 }
 
 /** Ответ на неизвестный маршрут или отсутствующий ресурс. */
@@ -62,4 +88,9 @@ interface MeetingTypes {
   /** Список типов встреч владельца. */
   @get
   list(): MeetingTypesOkResponse | NotFoundResponse;
+
+  /** Создание типа встречи. */
+  @post
+  create(@body body: CreateMeetingTypeRequest):
+    MeetingTypeCreatedResponse | ValidationErrorResponse;
 }

@@ -1,4 +1,4 @@
-import type { ErrorBody, ErrorBodyEnvelope, ErrorField, MeetingType, MeetingTypeList } from "../models.js";
+import type { CreateMeetingTypeRequest, ErrorBody, ErrorBodyEnvelope, ErrorField, MeetingType, MeetingTypeCreatedBody, MeetingTypeList } from "../models.js";
 export declare function decodeBase64(value: string): Uint8Array | undefined;
 export declare function encodeUint8Array(value: Uint8Array | undefined | null, encoding: BufferEncoding): string | undefined;
 export declare function dateDeserializer(date?: string | null): Date;
@@ -7,6 +7,7 @@ export declare function dateRfc3339Serializer(date?: Date | null): string;
 export declare function dateRfc7231Serializer(date?: Date | null): string;
 export declare function dateUnixTimestampSerializer(date?: Date | null): number;
 export declare function dateUnixTimestampDeserializer(date?: number | null): Date;
+export declare function createPayloadToTransport(payload: CreateMeetingTypeRequest): any;
 export declare function jsonMeetingTypeListToTransportTransform(input_?: MeetingTypeList | null): any;
 export declare function jsonMeetingTypeListToApplicationTransform(input_?: any): MeetingTypeList;
 export declare function jsonArrayMeetingTypeToTransportTransform(items_?: Array<MeetingType> | null): any;
@@ -21,3 +22,7 @@ export declare function jsonArrayErrorFieldToTransportTransform(items_?: Array<E
 export declare function jsonArrayErrorFieldToApplicationTransform(items_?: any): Array<ErrorField>;
 export declare function jsonErrorFieldToTransportTransform(input_?: ErrorField | null): any;
 export declare function jsonErrorFieldToApplicationTransform(input_?: any): ErrorField;
+export declare function jsonCreateMeetingTypeRequestToTransportTransform(input_?: CreateMeetingTypeRequest | null): any;
+export declare function jsonCreateMeetingTypeRequestToApplicationTransform(input_?: any): CreateMeetingTypeRequest;
+export declare function jsonMeetingTypeCreatedBodyToTransportTransform(input_?: MeetingTypeCreatedBody | null): any;
+export declare function jsonMeetingTypeCreatedBodyToApplicationTransform(input_?: any): MeetingTypeCreatedBody;

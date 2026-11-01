@@ -49,6 +49,9 @@ export function dateUnixTimestampDeserializer(date) {
     }
     return new Date(date * 1000);
 }
+export function createPayloadToTransport(payload) {
+    return jsonCreateMeetingTypeRequestToTransportTransform(payload);
+}
 export function jsonMeetingTypeListToTransportTransform(input_) {
     if (!input_) {
         return input_;
@@ -171,5 +174,37 @@ export function jsonErrorFieldToApplicationTransform(input_) {
     }
     return {
         field: input_.field, message: input_.message
+    };
+}
+export function jsonCreateMeetingTypeRequestToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        name: input_.name, description: input_.description, durationMinutes: input_.durationMinutes
+    };
+}
+export function jsonCreateMeetingTypeRequestToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        name: input_.name, description: input_.description, durationMinutes: input_.durationMinutes
+    };
+}
+export function jsonMeetingTypeCreatedBodyToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meetingType: jsonMeetingTypeToTransportTransform(input_.meetingType)
+    };
+}
+export function jsonMeetingTypeCreatedBodyToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meetingType: jsonMeetingTypeToApplicationTransform(input_.meetingType)
     };
 }
