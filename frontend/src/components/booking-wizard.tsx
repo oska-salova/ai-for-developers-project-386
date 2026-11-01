@@ -20,54 +20,23 @@ import {
   normalizeGuestName,
   validateGuestInput,
 } from "@/lib/guest-input";
+import {
+  formatOwnerDateTime,
+  formatOwnerDayFromInstant,
+  formatOwnerDayOfMonth,
+  formatOwnerTime,
+  formatOwnerWeekday,
+} from "@/lib/owner-time";
 
-const OWNER_TIME_ZONE = "Europe/Moscow";
+/** Network failures stay vague: the server's own messages are shown verbatim. */
+const REQUEST_ERROR_MESSAGE = "Не удалось выполнить запрос";
 
-// Time is only formatted for display; the server owns every calculation. The
-// owner's zone is fixed, so the browser's local zone never leaks in.
-const timeFormatter = new Intl.DateTimeFormat("ru-RU", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-  timeZone: OWNER_TIME_ZONE,
-});
-
-const weekdayFormatter = new Intl.DateTimeFormat("ru-RU", {
-  weekday: "short",
-  timeZone: OWNER_TIME_ZONE,
-});
-
-const dayOfMonthFormatter = new Intl.DateTimeFormat("ru-RU", {
-  day: "numeric",
-  timeZone: OWNER_TIME_ZONE,
-});
-
-const longDayFormatter = new Intl.DateTimeFormat("ru-RU", {
-  day: "numeric",
-  month: "long",
-  timeZone: OWNER_TIME_ZONE,
-});
-
-/** The owner's calendar day as a moment safe from zone shifts. */
-function ownerDay(date: string): Date {
-  return new Date(`${date}T12:00:00.000Z`);
-}
-
-function formatTime(start: string): string {
-  return timeFormatter.format(new Date(start));
-}
-
-function formatLongDay(date: string): string {
-  return longDayFormatter.format(ownerDay(date));
-}
-
-function formatDateTime(date: string, start: string): string {
-  return `${formatLongDay(date)}, ${formatTime(start)}`;
-}
-
-/** The owner's date for an instant on the wire; only formatting, no math. */
-function formatLongInstant(start: string): string {
-  return longDayFormatter.format(new Date(start));
+/** The server's message for one field, or `null` when it did not report it. */
+function fieldMessage(
+  fields: readonly { field: string; message: string }[],
+  name: string,
+): string | null {
+  return fields.find((field) => field.field === name)?.message ?? null;
 }
 
 function availableCount(day: SlotDay): number {
@@ -143,7 +112,7 @@ export function BookingWizard() {
       })
       .catch(() => {
         if (active) {
-          setTypesError("Не удалось загрузить типы встреч");
+          setTypesError(REQUEST_ERROR_MESSAGE);
           setLoadingTypes(false);
         }
       });
@@ -179,7 +148,7 @@ export function BookingWizard() {
       );
     } catch {
       if (request === loadRequest.current) {
-        setSlotsError("Не удалось загрузить слоты");
+        setSlotsError(REQUEST_ERROR_MESSAGE);
       }
     } finally {
       if (request === loadRequest.current) {
@@ -280,17 +249,17 @@ export function BookingWizard() {
 
   function handleSubmitError(error: unknown) {
     if (!(error instanceof ApiError)) {
-      setSubmitError("Не удалось записать на встречу");
+      setSubmitError(REQUEST_ERROR_MESSAGE);
 
       return;
     }
 
-    const startField = error.fields.find((field) => field.field === "start");
+    const startMessage = fieldMessage(error.fields, "start");
 
     // A taken slot and a start the server rejects are the same situation for
     // the guest: go back to the grid, refetch it and drop the stale choice.
-    if (error.code === "slot_conflict" || startField !== undefined) {
-      setTimeMessage(startField?.message ?? error.message);
+    if (error.code === "slot_conflict" || startMessage !== null) {
+      setTimeMessage(startMessage ?? error.message);
       setSelectedStart(null);
       setStep(2);
 
@@ -301,15 +270,15 @@ export function BookingWizard() {
       return;
     }
 
-    const nameField = error.fields.find((field) => field.field === "guestName");
-    const emailField = error.fields.find((field) => field.field === "guestEmail");
+    const nameMessage = fieldMessage(error.fields, "guestName");
+    const emailMessage = fieldMessage(error.fields, "guestEmail");
     const nextErrors: GuestInputErrors = {};
 
-    if (nameField !== undefined) {
-      nextErrors.guestName = nameField.message;
+    if (nameMessage !== null) {
+      nextErrors.guestName = nameMessage;
     }
-    if (emailField !== undefined) {
-      nextErrors.guestEmail = emailField.message;
+    if (emailMessage !== null) {
+      nextErrors.guestEmail = emailMessage;
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -352,7 +321,7 @@ export function BookingWizard() {
             <div className="grid gap-0.5">
               <dt className="text-muted-foreground">Время</dt>
               <dd className="font-medium">
-                {formatLongInstant(booked.start)}, {formatTime(booked.start)}
+                {formatOwnerDayFromInstant(booked.start)}, {formatOwnerTime(booked.start)}
               </dd>
             </div>
             <div className="grid gap-0.5">
@@ -470,10 +439,10 @@ export function BookingWizard() {
                           } ${count === 0 ? "opacity-60" : ""}`}
                         >
                           <span className="text-[11px] capitalize text-muted-foreground">
-                            {weekdayFormatter.format(ownerDay(day.date))}
+                            {formatOwnerWeekday(day.date)}
                           </span>
                           <span className="text-sm font-medium">
-                            {dayOfMonthFormatter.format(ownerDay(day.date))}
+                            {formatOwnerDayOfMonth(day.date)}
                           </span>
                           <span className="text-[11px] text-muted-foreground">{count}</span>
                         </button>
@@ -507,7 +476,7 @@ export function BookingWizard() {
                               : "hover:bg-muted/60"
                           }`}
                         >
-                          {formatTime(slot.start)}
+                          {formatOwnerTime(slot.start)}
                         </button>
                       ))}
                     </div>
@@ -599,7 +568,9 @@ export function BookingWizard() {
                   </div>
                   <div className="grid gap-0.5">
                     <dt className="text-muted-foreground">Время</dt>
-                    <dd className="font-medium">{formatDateTime(selectedDate, selectedStart)}</dd>
+                    <dd className="font-medium">
+                      {formatOwnerDateTime(selectedDate, selectedStart)}
+                    </dd>
                   </div>
                   <div className="grid gap-0.5">
                     <dt className="text-muted-foreground">Имя</dt>

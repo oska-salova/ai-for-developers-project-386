@@ -9,7 +9,7 @@ export interface ListOptions extends OperationOptions {
  * @param {MeetingsClientContext} client
  * @param {ListOptions} [options]
  */
-export declare function list(client: MeetingsClientContext, options?: ListOptions): Promise<MeetingList>;
+export declare function list(client: MeetingsClientContext, options?: ListOptions): Promise<MeetingList | ErrorBodyEnvelope>;
 export interface CreateOptions extends OperationOptions {
 }
 /**

@@ -19,6 +19,9 @@ export async function list(client, options) {
     if (+response.status === 200 && response.headers["content-type"]?.includes("application/json")) {
         return jsonMeetingListToApplicationTransform(response.body);
     }
+    if (+response.status === 500 && response.headers["content-type"]?.includes("application/json")) {
+        return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
+    }
     throw createRestError(response);
 }
 ;
@@ -48,6 +51,9 @@ export async function create(client, body, options) {
         return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
     }
     if (+response.status === 409 && response.headers["content-type"]?.includes("application/json")) {
+        return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
+    }
+    if (+response.status === 500 && response.headers["content-type"]?.includes("application/json")) {
         return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
     }
     throw createRestError(response);

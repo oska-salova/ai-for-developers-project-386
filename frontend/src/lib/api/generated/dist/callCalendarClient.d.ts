@@ -20,6 +20,6 @@ export declare class MeetingTypesClient {
 export declare class MeetingsClient {
     #private;
     constructor(options?: MeetingsClientOptions);
-    list(options?: ListOptions): Promise<import("./models/models.js").MeetingList>;
-    create(body: CreateMeetingRequest, options?: CreateOptions): Promise<import("./models/models.js").MeetingCreatedBody | import("./models/models.js").ErrorBodyEnvelope>;
+    list(options?: ListOptions): Promise<import("./models/models.js").MeetingList | import("./models/models.js").ErrorBodyEnvelope>;
+    create(body: CreateMeetingRequest, options?: CreateOptions): Promise<import("./models/models.js").ErrorBodyEnvelope | import("./models/models.js").MeetingCreatedBody>;
 }

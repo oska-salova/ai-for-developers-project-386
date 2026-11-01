@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createApp } from "./app.js";
-import { createStore } from "./store.js";
+import { createStore, type MeetingTypeStore } from "./store.js";
 
 // The contract is the source of truth: these tests check that the real server
 // answers with codes and bodies the committed OpenAPI document declares.
@@ -111,6 +111,23 @@ function makeMeetingsApp() {
   };
 }
 
+const failing = (): never => {
+  throw new Error("Хранилище недоступно");
+};
+
+/** A store whose every operation fails, as an unexpected internal error would. */
+function makeThrowingApp() {
+  const store: MeetingTypeStore = {
+    listMeetingTypes: failing,
+    createMeetingType: failing,
+    findMeetingType: failing,
+    listMeetings: failing,
+    addMeeting: failing,
+  };
+
+  return createApp({ store, now: () => new Date("2026-11-01T09:00:00.000Z") });
+}
+
 const validMeeting = (meetingTypeId: string) => ({
   meetingTypeId,
   start: "2026-11-02T10:00:00.000Z",
@@ -154,13 +171,6 @@ describe("contract compliance", () => {
 
     expect(response.status).toBe(400);
     await validateResponse("/api/meeting-types", "post", response.status, response.body);
-  });
-
-  it("validates the 404 body of an unknown route", async () => {
-    const response = await request(makeApp()).get("/api/unknown");
-
-    expect(response.status).toBe(404);
-    await validateResponse("/api/meeting-types", "get", response.status, response.body);
   });
 
   it("rejects an extra field, so sealed schemas are enforced", async () => {
@@ -286,5 +296,57 @@ describe("contract compliance", () => {
 
     expect(response.status).toBe(409);
     await validateResponse("/api/meetings", "post", response.status, response.body);
+  });
+
+  describe("internal errors", () => {
+    it("validates the 500 body of GET /api/meeting-types", async () => {
+      const response = await request(makeThrowingApp()).get("/api/meeting-types");
+
+      expect(response.status).toBe(500);
+      expect(response.body).toMatchObject({ error: { code: "internal_error" } });
+      await validateResponse("/api/meeting-types", "get", response.status, response.body);
+    });
+
+    it("validates the 500 body of POST /api/meeting-types", async () => {
+      const response = await request(makeThrowingApp()).post("/api/meeting-types").send({
+        name: "Созвон по проекту",
+        durationMinutes: 60,
+      });
+
+      expect(response.status).toBe(500);
+      expect(response.body).toMatchObject({ error: { code: "internal_error" } });
+      await validateResponse("/api/meeting-types", "post", response.status, response.body);
+    });
+
+    it("validates the 500 body of GET /api/meeting-types/:id/slots", async () => {
+      const response = await request(makeThrowingApp()).get("/api/meeting-types/id/slots");
+
+      expect(response.status).toBe(500);
+      expect(response.body).toMatchObject({ error: { code: "internal_error" } });
+      await validateResponse(
+        "/api/meeting-types/{id}/slots",
+        "get",
+        response.status,
+        response.body,
+      );
+    });
+
+    it("validates the 500 body of GET /api/meetings", async () => {
+      const response = await request(makeThrowingApp()).get("/api/meetings");
+
+      expect(response.status).toBe(500);
+      expect(response.body).toMatchObject({ error: { code: "internal_error" } });
+      await validateResponse("/api/meetings", "get", response.status, response.body);
+    });
+
+    it("validates the 500 body of POST /api/meetings", async () => {
+      const response = await request(makeThrowingApp())
+        .post("/api/meetings")
+        .send(validMeeting("id"));
+
+      expect(response.status).toBe(500);
+      expect(response.body).toMatchObject({ error: { code: "internal_error" } });
+      await validateResponse("/api/meetings", "post", response.status, response.body);
+    });
   });
 });

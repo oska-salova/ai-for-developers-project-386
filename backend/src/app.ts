@@ -3,16 +3,12 @@ import express, { type Express } from "express";
 import type { components } from "./generated/openapi.js";
 import {
   MEETING_TYPE_NOT_FOUND_MESSAGE,
-  MEETING_VALIDATION_MESSAGE,
   parseMeetingFields,
   parseMeetingStart,
   SLOT_CONFLICT_MESSAGE,
 } from "./meeting-input.js";
-import {
-  MALFORMED_JSON_MESSAGE,
-  parseCreateMeetingType,
-  VALIDATION_MESSAGE,
-} from "./meeting-type-input.js";
+import { parseCreateMeetingType } from "./meeting-type-input.js";
+import { INTERNAL_ERROR_MESSAGE, MALFORMED_JSON_MESSAGE, VALIDATION_MESSAGE } from "./messages.js";
 import { buildSlots, busyIntervalsFromMeetings } from "./slots.js";
 import type { Meeting, MeetingTypeStore } from "./store.js";
 
@@ -30,15 +26,32 @@ type MeetingTypeCreatedBody = components["schemas"]["MeetingTypeCreatedBody"];
 type MeetingBody = components["schemas"]["Meeting"];
 type MeetingListBody = components["schemas"]["MeetingList"];
 type MeetingCreatedBody = components["schemas"]["MeetingCreatedBody"];
+type ErrorBody = components["schemas"]["ErrorBody"];
 type ErrorBodyEnvelope = components["schemas"]["ErrorBodyEnvelope"];
 type ErrorField = components["schemas"]["ErrorField"];
 
-function errorEnvelope(code: string, message: string): ErrorBodyEnvelope {
-  return { error: { code, message } };
+/** The machine codes of the shared error envelope. */
+const ERROR_CODES = {
+  validation: "validation_error",
+  notFound: "not_found",
+  slotConflict: "slot_conflict",
+  internal: "internal_error",
+} as const;
+
+type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
+
+function errorEnvelope(code: ErrorCode, message: string, fields?: ErrorField[]): ErrorBodyEnvelope {
+  const error: ErrorBody = { code, message };
+
+  if (fields !== undefined) {
+    error.fields = fields;
+  }
+
+  return { error };
 }
 
 function validationEnvelope(fields: ErrorField[]): ErrorBodyEnvelope {
-  return { error: { code: "validation_error", message: MEETING_VALIDATION_MESSAGE, fields } };
+  return errorEnvelope(ERROR_CODES.validation, VALIDATION_MESSAGE, fields);
 }
 
 /** The wire shape of a meeting: a type summary, never a snapshot. */
@@ -94,13 +107,7 @@ export function createApp({ store, now }: AppDependencies): Express {
     const parsed = parseCreateMeetingType(req.body);
 
     if (!parsed.ok) {
-      res.status(400).json({
-        error: {
-          code: "validation_error",
-          message: VALIDATION_MESSAGE,
-          fields: parsed.fields,
-        },
-      } satisfies ErrorBodyEnvelope);
+      res.status(400).json(validationEnvelope(parsed.fields));
 
       return;
     }
@@ -116,7 +123,7 @@ export function createApp({ store, now }: AppDependencies): Express {
     const meetingType = store.findMeetingType(req.params.id);
 
     if (meetingType === undefined) {
-      res.status(404).json(errorEnvelope("not_found", "Тип встречи не найден"));
+      res.status(404).json(errorEnvelope(ERROR_CODES.notFound, MEETING_TYPE_NOT_FOUND_MESSAGE));
 
       return;
     }
@@ -168,7 +175,7 @@ export function createApp({ store, now }: AppDependencies): Express {
     const meetingType = store.findMeetingType(parsed.value.meetingTypeId);
 
     if (meetingType === undefined) {
-      res.status(404).json(errorEnvelope("not_found", MEETING_TYPE_NOT_FOUND_MESSAGE));
+      res.status(404).json(errorEnvelope(ERROR_CODES.notFound, MEETING_TYPE_NOT_FOUND_MESSAGE));
 
       return;
     }
@@ -190,13 +197,13 @@ export function createApp({ store, now }: AppDependencies): Express {
 
     if (!added.ok) {
       if (added.reason === "meeting_type_not_found") {
-        res.status(404).json(errorEnvelope("not_found", MEETING_TYPE_NOT_FOUND_MESSAGE));
+        res.status(404).json(errorEnvelope(ERROR_CODES.notFound, MEETING_TYPE_NOT_FOUND_MESSAGE));
 
         return;
       }
 
       // A conflict says nothing about the meeting that took the slot.
-      res.status(409).json(errorEnvelope("slot_conflict", SLOT_CONFLICT_MESSAGE));
+      res.status(409).json(errorEnvelope(ERROR_CODES.slotConflict, SLOT_CONFLICT_MESSAGE));
 
       return;
     }
@@ -209,11 +216,13 @@ export function createApp({ store, now }: AppDependencies): Express {
   });
 
   app.use((_req, res) => {
-    res.status(404).json(errorEnvelope("not_found", "Маршрут не найден"));
+    res.status(404).json(errorEnvelope(ERROR_CODES.notFound, "Маршрут не найден"));
   });
 
   // express.json() rejects a broken body before any route runs; the answer
-  // still has to use the shared error envelope.
+  // still has to use the shared error envelope. Anything else that reaches
+  // this middleware is unexpected: answer with the envelope, never with the
+  // HTML page and stack of Express's default handler.
   app.use(
     (error: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
       if (res.headersSent) {
@@ -223,12 +232,12 @@ export function createApp({ store, now }: AppDependencies): Express {
       }
 
       if (isMalformedJson(error)) {
-        res.status(400).json(errorEnvelope("validation_error", MALFORMED_JSON_MESSAGE));
+        res.status(400).json(errorEnvelope(ERROR_CODES.validation, MALFORMED_JSON_MESSAGE));
 
         return;
       }
 
-      next(error);
+      res.status(500).json(errorEnvelope(ERROR_CODES.internal, INTERNAL_ERROR_MESSAGE));
     },
   );
 

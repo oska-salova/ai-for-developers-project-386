@@ -224,8 +224,8 @@ export interface operations {
                     "application/json": components["schemas"]["MeetingTypeList"];
                 };
             };
-            /** @description Ответ на неизвестный маршрут или отсутствующий ресурс. */
-            404: {
+            /** @description Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются. */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -266,6 +266,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBodyEnvelope"];
                 };
             };
+            /** @description Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
         };
     };
     MeetingTypes_slots: {
@@ -297,6 +306,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBodyEnvelope"];
                 };
             };
+            /** @description Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
         };
     };
     Meetings_list: {
@@ -315,6 +333,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeetingList"];
+                };
+            };
+            /** @description Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
                 };
             };
         };
@@ -361,6 +388,15 @@ export interface operations {
             };
             /** @description Ответ на попытку занять уже занятый слот; без данных о чужой встрече. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
+            /** @description Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются. */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };

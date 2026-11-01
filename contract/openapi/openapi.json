@@ -22,8 +22,8 @@
               }
             }
           },
-          "404": {
-            "description": "Ответ на неизвестный маршрут или отсутствующий ресурс.",
+          "500": {
+            "description": "Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются.",
             "content": {
               "application/json": {
                 "schema": {
@@ -51,6 +51,16 @@
           },
           "400": {
             "description": "Ответ на запрос, поля которого не прошли проверку.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются.",
             "content": {
               "application/json": {
                 "schema": {
@@ -106,6 +116,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -122,6 +142,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MeetingList"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
                 }
               }
             }
@@ -165,6 +195,16 @@
           },
           "409": {
             "description": "Ответ на попытку занять уже занятый слот; без данных о чужой встрече.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются.",
             "content": {
               "application/json": {
                 "schema": {

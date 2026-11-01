@@ -5,12 +5,6 @@ import { normalizeSpaces } from "./text.js";
 
 type ErrorField = components["schemas"]["ErrorField"];
 
-/** The general message of a validation failure; field texts live in FIELD_MESSAGES. */
-export const VALIDATION_MESSAGE = "Проверьте заполнение полей";
-
-/** The message of a body that could not be parsed as JSON at all. */
-export const MALFORMED_JSON_MESSAGE = "Тело запроса должно быть корректным JSON";
-
 /**
  * The verbatim field messages of `POST /api/meeting-types`. They are part of
  * the contract: the owner's form shows them under the fields as they are.

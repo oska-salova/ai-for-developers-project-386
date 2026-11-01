@@ -152,42 +152,6 @@ export function decodeBase64(value: string): Uint8Array | undefined {
     return {
     id: input_.id,name: input_.name,durationMinutes: input_.durationMinutes
   }!;
-}export function jsonCreateMeetingRequestToTransportTransform(
-  input_?: CreateMeetingRequest | null,
-): any {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    meetingTypeId: input_.meetingTypeId,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail
-  }!;
-}export function jsonCreateMeetingRequestToApplicationTransform(
-  input_?: any,
-): CreateMeetingRequest {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    meetingTypeId: input_.meetingTypeId,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail
-  }!;
-}export function jsonMeetingCreatedBodyToTransportTransform(
-  input_?: MeetingCreatedBody | null,
-): any {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    meeting: jsonMeetingToTransportTransform(input_.meeting)
-  }!;
-}export function jsonMeetingCreatedBodyToApplicationTransform(
-  input_?: any,
-): MeetingCreatedBody {
-  if(!input_) {
-    return input_ as any;
-  }
-    return {
-    meeting: jsonMeetingToApplicationTransform(input_.meeting)
-  }!;
 }export function jsonErrorBodyEnvelopeToTransportTransform(
   input_?: ErrorBodyEnvelope | null,
 ): any {
@@ -267,6 +231,42 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   }
     return {
     field: input_.field,message: input_.message
+  }!;
+}export function jsonCreateMeetingRequestToTransportTransform(
+  input_?: CreateMeetingRequest | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingTypeId: input_.meetingTypeId,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail
+  }!;
+}export function jsonCreateMeetingRequestToApplicationTransform(
+  input_?: any,
+): CreateMeetingRequest {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingTypeId: input_.meetingTypeId,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail
+  }!;
+}export function jsonMeetingCreatedBodyToTransportTransform(
+  input_?: MeetingCreatedBody | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meeting: jsonMeetingToTransportTransform(input_.meeting)
+  }!;
+}export function jsonMeetingCreatedBodyToApplicationTransform(
+  input_?: any,
+): MeetingCreatedBody {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meeting: jsonMeetingToApplicationTransform(input_.meeting)
   }!;
 }export function jsonMeetingTypeListToTransportTransform(
   input_?: MeetingTypeList | null,

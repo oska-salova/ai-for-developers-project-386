@@ -19,7 +19,7 @@ export async function list(client, options) {
     if (+response.status === 200 && response.headers["content-type"]?.includes("application/json")) {
         return jsonMeetingTypeListToApplicationTransform(response.body);
     }
-    if (+response.status === 404 && response.headers["content-type"]?.includes("application/json")) {
+    if (+response.status === 500 && response.headers["content-type"]?.includes("application/json")) {
         return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
     }
     throw createRestError(response);
@@ -47,6 +47,9 @@ export async function create(client, body, options) {
     if (+response.status === 400 && response.headers["content-type"]?.includes("application/json")) {
         return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
     }
+    if (+response.status === 500 && response.headers["content-type"]?.includes("application/json")) {
+        return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
+    }
     throw createRestError(response);
 }
 ;
@@ -72,6 +75,9 @@ export async function slots(client, id, options) {
         return jsonSlotsEnvelopeToApplicationTransform(response.body);
     }
     if (+response.status === 404 && response.headers["content-type"]?.includes("application/json")) {
+        return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
+    }
+    if (+response.status === 500 && response.headers["content-type"]?.includes("application/json")) {
         return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
     }
     throw createRestError(response);

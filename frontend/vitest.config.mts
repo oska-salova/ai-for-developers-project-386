@@ -18,7 +18,6 @@ export default defineConfig({
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
-        "src/app/layout.tsx",
         "src/**/*.test.ts",
         "src/**/*.test.tsx",
         // Test harness, not application code.

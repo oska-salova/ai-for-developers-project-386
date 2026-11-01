@@ -2,22 +2,17 @@ import type { components } from "./generated/openapi.js";
 import { intervalsOverlap } from "./overlap.js";
 import { addDays, ownerDate, ownerTimeInstant, OWNER_TIMEZONE } from "./owner-time.js";
 import type { Meeting } from "./store.js";
+import {
+  meetingEnd,
+  SLOT_STEP_MINUTES,
+  WINDOW_DAYS,
+  WORKDAY_END_MINUTES,
+  WORKDAY_START_MINUTES,
+} from "./time-rules.js";
 
 type SlotsEnvelope = components["schemas"]["SlotsEnvelope"];
 type Slot = components["schemas"]["Slot"];
 type SlotDay = components["schemas"]["SlotDay"];
-
-const MINUTE_MS = 60 * 1000;
-
-/** The booking window is today plus the following 13 owner days. */
-const WINDOW_DAYS = 14;
-
-/** Working hours are 09:00–18:00 every day, without weekends or lunches. */
-const WORKDAY_START_MINUTES = 9 * 60;
-const WORKDAY_END_MINUTES = 18 * 60;
-
-/** Offered starts are every 15 minutes: 09:00, 09:15, …, 17:45. */
-const SLOT_STEP_MINUTES = 15;
 
 /** A half-open `[start, end)` interval that blocks overlapping slots. */
 export interface BusyInterval {
@@ -45,7 +40,7 @@ function slotsForDay(date: string, input: SlotEngineInput, nowMs: number): SlotD
   ) {
     const start = ownerTimeInstant(date, minutes);
     const startMs = start.getTime();
-    const endMs = startMs + input.durationMinutes * MINUTE_MS;
+    const endMs = meetingEnd(start, input.durationMinutes).getTime();
     const available =
       startMs > nowMs &&
       endMs <= workdayEndMs &&
@@ -96,7 +91,7 @@ export function busyIntervalsFromMeetings(
 
     intervals.push({
       start: meeting.start,
-      end: new Date(meeting.start.getTime() + durationMinutes * MINUTE_MS),
+      end: meetingEnd(meeting.start, durationMinutes),
     });
   }
 

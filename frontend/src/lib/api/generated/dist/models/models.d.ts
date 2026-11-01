@@ -50,24 +50,6 @@ export type Integer = number;
  */
 export type Numeric = number;
 /**
- * Поля, которые гость присылает при записи на слот.
- */
-export interface CreateMeetingRequest {
-    meetingTypeId: string;
-    /**
-     * Мгновение начала в ISO 8601 UTC с суффиксом Z.
-     */
-    start: string;
-    guestName: string;
-    guestEmail: string;
-}
-/**
- * Тело успешного ответа на запись гостя.
- */
-export interface MeetingCreatedBody {
-    meeting: Meeting;
-}
-/**
  * Единая рамка ошибок API.
  */
 export interface ErrorBodyEnvelope {
@@ -99,6 +81,24 @@ export interface ErrorField {
      * Сообщение об ошибке, которое интерфейс показывает дословно.
      */
     message: string;
+}
+/**
+ * Поля, которые гость присылает при записи на слот.
+ */
+export interface CreateMeetingRequest {
+    meetingTypeId: string;
+    /**
+     * Мгновение начала в ISO 8601 UTC с суффиксом Z.
+     */
+    start: string;
+    guestName: string;
+    guestEmail: string;
+}
+/**
+ * Тело успешного ответа на запись гостя.
+ */
+export interface MeetingCreatedBody {
+    meeting: Meeting;
 }
 /**
  * Ответ со списком типов встреч.

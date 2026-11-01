@@ -2,24 +2,20 @@ import { asRecord, readField } from "./body-input.js";
 import type { components } from "./generated/openapi.js";
 import { addDays, ownerDate, ownerTimeInstant } from "./owner-time.js";
 import { normalizeSpaces } from "./text.js";
+import {
+  meetingEnd,
+  SLOT_STEP_MINUTES,
+  WINDOW_DAYS,
+  WORKDAY_END_MINUTES,
+  WORKDAY_START_MINUTES,
+} from "./time-rules.js";
 
 type ErrorField = components["schemas"]["ErrorField"];
-
-/** The message of a body whose fields could not be normalized. */
-export const MEETING_VALIDATION_MESSAGE = "Проверьте заполнение полей";
 
 /** Shown when the requested slot is already taken; never names the taker. */
 export const SLOT_CONFLICT_MESSAGE = "Это время уже заняли";
 
 export const MEETING_TYPE_NOT_FOUND_MESSAGE = "Тип встречи не найден";
-
-/** The last day of the booking window is today plus 13 owner days. */
-const WINDOW_DAYS = 14;
-
-const WORKDAY_START_MINUTES = 9 * 60;
-const WORKDAY_END_MINUTES = 18 * 60;
-const SLOT_STEP_MINUTES = 15;
-const MINUTE_MS = 60 * 1000;
 
 const MAX_GUEST_NAME_LENGTH = 100;
 const MAX_GUEST_EMAIL_LENGTH = 254;
@@ -256,7 +252,7 @@ export function parseMeetingStart(
   const workdayStartMs = ownerTimeInstant(day, WORKDAY_START_MINUTES).getTime();
   const workdayEndMs = ownerTimeInstant(day, WORKDAY_END_MINUTES).getTime();
 
-  if (startMs < workdayStartMs || startMs + durationMinutes * MINUTE_MS > workdayEndMs) {
+  if (startMs < workdayStartMs || meetingEnd(instant, durationMinutes).getTime() > workdayEndMs) {
     return startError(FIELD_MESSAGES.startOutsideWorkingHours);
   }
 

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { components } from "./generated/openapi.js";
 import { intervalsOverlap } from "./overlap.js";
+import { meetingEnd } from "./time-rules.js";
 
 /** A booking template the owner offers, as described by the API contract. */
 type MeetingType = components["schemas"]["MeetingType"];
@@ -38,8 +39,6 @@ type AddMeetingResult =
 export interface StoreSeed {
   meetings?: readonly Meeting[];
 }
-
-const MINUTE_MS = 60 * 1000;
 
 /**
  * Synchronous in-memory storage for meeting types and meetings. Every method
@@ -87,7 +86,7 @@ export function createStore(seed: StoreSeed = {}): MeetingTypeStore {
       }
 
       const startMs = input.start.getTime();
-      const endMs = startMs + meetingType.durationMinutes * MINUTE_MS;
+      const endMs = meetingEnd(input.start, meetingType.durationMinutes).getTime();
       const conflicts = meetings.some((meeting) => {
         const otherType = meetingTypes.find((type) => type.id === meeting.meetingTypeId);
 
@@ -98,7 +97,7 @@ export function createStore(seed: StoreSeed = {}): MeetingTypeStore {
         }
 
         const otherStartMs = meeting.start.getTime();
-        const otherEndMs = otherStartMs + otherType.durationMinutes * MINUTE_MS;
+        const otherEndMs = meetingEnd(meeting.start, otherType.durationMinutes).getTime();
 
         return intervalsOverlap(startMs, endMs, otherStartMs, otherEndMs);
       });

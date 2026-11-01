@@ -125,38 +125,6 @@ export function jsonMeetingTypeSummaryToApplicationTransform(input_) {
         id: input_.id, name: input_.name, durationMinutes: input_.durationMinutes
     };
 }
-export function jsonCreateMeetingRequestToTransportTransform(input_) {
-    if (!input_) {
-        return input_;
-    }
-    return {
-        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
-    };
-}
-export function jsonCreateMeetingRequestToApplicationTransform(input_) {
-    if (!input_) {
-        return input_;
-    }
-    return {
-        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
-    };
-}
-export function jsonMeetingCreatedBodyToTransportTransform(input_) {
-    if (!input_) {
-        return input_;
-    }
-    return {
-        meeting: jsonMeetingToTransportTransform(input_.meeting)
-    };
-}
-export function jsonMeetingCreatedBodyToApplicationTransform(input_) {
-    if (!input_) {
-        return input_;
-    }
-    return {
-        meeting: jsonMeetingToApplicationTransform(input_.meeting)
-    };
-}
 export function jsonErrorBodyEnvelopeToTransportTransform(input_) {
     if (!input_) {
         return input_;
@@ -225,6 +193,38 @@ export function jsonErrorFieldToApplicationTransform(input_) {
     }
     return {
         field: input_.field, message: input_.message
+    };
+}
+export function jsonCreateMeetingRequestToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
+    };
+}
+export function jsonCreateMeetingRequestToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meetingTypeId: input_.meetingTypeId, start: input_.start, guestName: input_.guestName, guestEmail: input_.guestEmail
+    };
+}
+export function jsonMeetingCreatedBodyToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meeting: jsonMeetingToTransportTransform(input_.meeting)
+    };
+}
+export function jsonMeetingCreatedBodyToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        meeting: jsonMeetingToApplicationTransform(input_.meeting)
     };
 }
 export function jsonMeetingTypeListToTransportTransform(input_) {

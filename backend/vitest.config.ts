@@ -6,9 +6,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
-      // Not unit-tested: generated types drift-check in `contract:check`, and
-      // the entry points bind a port that the e2e run exercises.
-      exclude: ["src/**/*.test.ts", "src/generated/**", "src/index.ts", "src/dev-seeded.ts"],
+      // Generated types drift-check in `contract:check` instead of counting here.
+      exclude: ["src/**/*.test.ts", "src/generated/**"],
       thresholds: {
         lines: 60,
         functions: 60,

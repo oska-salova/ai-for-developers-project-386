@@ -17,10 +17,6 @@ export declare function jsonMeetingToTransportTransform(input_?: Meeting | null)
 export declare function jsonMeetingToApplicationTransform(input_?: any): Meeting;
 export declare function jsonMeetingTypeSummaryToTransportTransform(input_?: MeetingTypeSummary | null): any;
 export declare function jsonMeetingTypeSummaryToApplicationTransform(input_?: any): MeetingTypeSummary;
-export declare function jsonCreateMeetingRequestToTransportTransform(input_?: CreateMeetingRequest | null): any;
-export declare function jsonCreateMeetingRequestToApplicationTransform(input_?: any): CreateMeetingRequest;
-export declare function jsonMeetingCreatedBodyToTransportTransform(input_?: MeetingCreatedBody | null): any;
-export declare function jsonMeetingCreatedBodyToApplicationTransform(input_?: any): MeetingCreatedBody;
 export declare function jsonErrorBodyEnvelopeToTransportTransform(input_?: ErrorBodyEnvelope | null): any;
 export declare function jsonErrorBodyEnvelopeToApplicationTransform(input_?: any): ErrorBodyEnvelope;
 export declare function jsonErrorBodyToTransportTransform(input_?: ErrorBody | null): any;
@@ -29,6 +25,10 @@ export declare function jsonArrayErrorFieldToTransportTransform(items_?: Array<E
 export declare function jsonArrayErrorFieldToApplicationTransform(items_?: any): Array<ErrorField>;
 export declare function jsonErrorFieldToTransportTransform(input_?: ErrorField | null): any;
 export declare function jsonErrorFieldToApplicationTransform(input_?: any): ErrorField;
+export declare function jsonCreateMeetingRequestToTransportTransform(input_?: CreateMeetingRequest | null): any;
+export declare function jsonCreateMeetingRequestToApplicationTransform(input_?: any): CreateMeetingRequest;
+export declare function jsonMeetingCreatedBodyToTransportTransform(input_?: MeetingCreatedBody | null): any;
+export declare function jsonMeetingCreatedBodyToApplicationTransform(input_?: any): MeetingCreatedBody;
 export declare function jsonMeetingTypeListToTransportTransform(input_?: MeetingTypeList | null): any;
 export declare function jsonMeetingTypeListToApplicationTransform(input_?: any): MeetingTypeList;
 export declare function jsonArrayMeetingTypeToTransportTransform(items_?: Array<MeetingType> | null): any;

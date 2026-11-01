@@ -1,7 +1,5 @@
 import { expect, test, type Locator } from "@playwright/test";
 
-const BACKEND_URL = "http://localhost:3001";
-
 /** The date part of a day button's `YYYY-MM-DD, свободных слотов: N` label. */
 function dayDate(label: string | null): string {
   const date = label?.split(",")[0];
@@ -31,13 +29,7 @@ async function firstAvailableSlot(slots: Locator): Promise<Locator> {
 
 test("owner creates a type, a guest books a slot and the owner sees the meeting", async ({
   page,
-  request,
 }) => {
-  // The backend is the second Playwright webServer; make the health check
-  // explicit so a broken backend fails here, not as an empty page later.
-  const health = await request.get(`${BACKEND_URL}/health`);
-  expect(health.ok()).toBeTruthy();
-
   // Unique on every run, so the scenario does not depend on earlier state.
   const runId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const typeName = `E2E звонок ${runId}`;

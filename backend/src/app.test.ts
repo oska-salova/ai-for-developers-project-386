@@ -70,3 +70,21 @@ describe("unknown routes", () => {
     });
   });
 });
+
+describe("unexpected failures", () => {
+  it("answers with the internal_error envelope instead of an HTML page", async () => {
+    const store: MeetingTypeStore = {
+      ...createStore(),
+      listMeetingTypes() {
+        throw new Error("Хранилище недоступно");
+      },
+    };
+
+    const response = await request(makeApp(store)).get("/api/meeting-types");
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({
+      error: { code: "internal_error", message: "Внутренняя ошибка сервера" },
+    });
+  });
+});

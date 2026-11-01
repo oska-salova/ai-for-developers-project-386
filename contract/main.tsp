@@ -181,11 +181,18 @@ model NotFoundResponse {
   @body body: ErrorBodyEnvelope;
 }
 
+/** Ответ на непредвиденную ошибку сервера; подробности наружу не отдаются. */
+model InternalErrorResponse {
+  @statusCode statusCode: 500;
+  @header("content-type") contentType: "application/json";
+  @body body: ErrorBodyEnvelope;
+}
+
 @route("/api/meetings")
 interface Meetings {
   /** Предстоящие встречи владельца, без параметров. */
   @get
-  list(): MeetingsOkResponse;
+  list(): MeetingsOkResponse | InternalErrorResponse;
 
   /** Запись гостя на свободный слот. */
   @post
@@ -193,22 +200,23 @@ interface Meetings {
     | MeetingCreatedResponse
     | ValidationErrorResponse
     | NotFoundResponse
-    | SlotConflictResponse;
+    | SlotConflictResponse
+    | InternalErrorResponse;
 }
 
 @route("/api/meeting-types")
 interface MeetingTypes {
   /** Список типов встреч владельца. */
   @get
-  list(): MeetingTypesOkResponse | NotFoundResponse;
+  list(): MeetingTypesOkResponse | InternalErrorResponse;
 
   /** Создание типа встречи. */
   @post
   create(@body body: CreateMeetingTypeRequest):
-    MeetingTypeCreatedResponse | ValidationErrorResponse;
+    MeetingTypeCreatedResponse | ValidationErrorResponse | InternalErrorResponse;
 
   /** Полная сетка слотов типа встречи на окно записи. */
   @get
   @route("/{id}/slots")
-  slots(@path id: string): SlotsOkResponse | NotFoundResponse;
+  slots(@path id: string): SlotsOkResponse | NotFoundResponse | InternalErrorResponse;
 }
