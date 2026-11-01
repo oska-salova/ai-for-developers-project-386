@@ -1,0 +1,206 @@
+import type {
+  ErrorBody,
+  ErrorBodyEnvelope,
+  ErrorField,
+  MeetingType,
+  MeetingTypeList,
+} from "../models.js";
+
+export function decodeBase64(value: string): Uint8Array | undefined {
+  if(!value) {
+    return value as any;
+  }
+  // Normalize Base64URL to Base64
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/')
+    .padEnd(value.length + (4 - (value.length % 4)) % 4, '=');
+
+  return new Uint8Array(Buffer.from(base64, 'base64'));
+}export function encodeUint8Array(
+  value: Uint8Array | undefined | null,
+  encoding: BufferEncoding,
+): string | undefined {
+  if (!value) {
+    return value as any;
+  }
+  return Buffer.from(value).toString(encoding);
+}export function dateDeserializer(date?: string | null): Date {
+  if (!date) {
+    return date as any;
+  }
+
+  return new Date(date);
+}export function dateRfc7231Deserializer(date?: string | null): Date {
+  if (!date) {
+    return date as any;
+  }
+
+  return new Date(date);
+}export function dateRfc3339Serializer(date?: Date | null): string {
+  if (!date) {
+    return date as any
+  }
+
+  return date.toISOString();
+}export function dateRfc7231Serializer(date?: Date | null): string {
+  if (!date) {
+    return date as any;
+  }
+
+  return date.toUTCString();
+}export function dateUnixTimestampSerializer(date?: Date | null): number {
+  if (!date) {
+    return date as any;
+  }
+
+  return Math.floor(date.getTime() / 1000);
+}export function dateUnixTimestampDeserializer(date?: number | null): Date {
+  if (!date) {
+    return date as any;
+  }
+
+  return new Date(date * 1000);
+}export function jsonMeetingTypeListToTransportTransform(
+  input_?: MeetingTypeList | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingTypes: jsonArrayMeetingTypeToTransportTransform(input_.meetingTypes)
+  }!;
+}export function jsonMeetingTypeListToApplicationTransform(
+  input_?: any,
+): MeetingTypeList {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingTypes: jsonArrayMeetingTypeToApplicationTransform(input_.meetingTypes)
+  }!;
+}export function jsonArrayMeetingTypeToTransportTransform(
+  items_?: Array<MeetingType> | null,
+): any {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonMeetingTypeToTransportTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonArrayMeetingTypeToApplicationTransform(
+  items_?: any,
+): Array<MeetingType> {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonMeetingTypeToApplicationTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonMeetingTypeToTransportTransform(
+  input_?: MeetingType | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
+  }!;
+}export function jsonMeetingTypeToApplicationTransform(
+  input_?: any,
+): MeetingType {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
+  }!;
+}export function jsonErrorBodyEnvelopeToTransportTransform(
+  input_?: ErrorBodyEnvelope | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    error: jsonErrorBodyToTransportTransform(input_.error)
+  }!;
+}export function jsonErrorBodyEnvelopeToApplicationTransform(
+  input_?: any,
+): ErrorBodyEnvelope {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    error: jsonErrorBodyToApplicationTransform(input_.error)
+  }!;
+}export function jsonErrorBodyToTransportTransform(
+  input_?: ErrorBody | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    code: input_.code,message: input_.message,fields: jsonArrayErrorFieldToTransportTransform(input_.fields)
+  }!;
+}export function jsonErrorBodyToApplicationTransform(input_?: any): ErrorBody {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    code: input_.code,message: input_.message,fields: jsonArrayErrorFieldToApplicationTransform(input_.fields)
+  }!;
+}export function jsonArrayErrorFieldToTransportTransform(
+  items_?: Array<ErrorField> | null,
+): any {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonErrorFieldToTransportTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonArrayErrorFieldToApplicationTransform(
+  items_?: any,
+): Array<ErrorField> {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonErrorFieldToApplicationTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonErrorFieldToTransportTransform(
+  input_?: ErrorField | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    field: input_.field,message: input_.message
+  }!;
+}export function jsonErrorFieldToApplicationTransform(
+  input_?: any,
+): ErrorField {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    field: input_.field,message: input_.message
+  }!;
+}

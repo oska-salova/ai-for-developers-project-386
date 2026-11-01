@@ -1,0 +1,72 @@
+import type { HttpClient } from "@typespec/ts-http-runtime";
+import {
+  CallCalendarClient,
+  type ErrorBody,
+  type ErrorBodyEnvelope,
+  type MeetingType,
+} from "./api/generated/dist/index.js";
+
+export type { MeetingType };
+
+/** Where the SDK talks to the backend when NEXT_PUBLIC_API_URL is not set. */
+const DEFAULT_API_URL = "http://localhost:3001";
+
+/** An error the API reported inside its `{ error }` envelope. */
+export class ApiError extends Error {
+  readonly code: string;
+  readonly fields: NonNullable<ErrorBody["fields"]>;
+
+  constructor(error: ErrorBody) {
+    super(error.message);
+    this.name = "ApiError";
+    this.code = error.code;
+    this.fields = error.fields ?? [];
+  }
+}
+
+export function resolveApiUrl(): string {
+  return process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_URL;
+}
+
+interface ApiClientOptions {
+  endpoint?: string;
+  /** Injected so tests can observe the requests without a network. */
+  httpClient?: HttpClient;
+}
+
+export function createApiClient({
+  endpoint = resolveApiUrl(),
+  httpClient,
+}: ApiClientOptions = {}): CallCalendarClient {
+  return new CallCalendarClient({
+    endpoint,
+    // The local backend speaks plain HTTP; production would use HTTPS.
+    allowInsecureConnection: true,
+    httpClient,
+  });
+}
+
+/** The one client the app uses: the base URL lives here and nowhere else. */
+const apiClient = createApiClient();
+
+function isErrorEnvelope(value: unknown): value is ErrorBodyEnvelope {
+  return typeof value === "object" && value !== null && "error" in value;
+}
+
+/**
+ * The generated SDK returns declared error codes as values, not exceptions.
+ * Turn them into ApiError so pages can show the server message verbatim.
+ */
+export function unwrap<T>(result: T | ErrorBodyEnvelope): T {
+  if (isErrorEnvelope(result)) {
+    throw new ApiError(result.error);
+  }
+
+  return result as T;
+}
+
+export async function listMeetingTypes() {
+  const result = await apiClient.meetingTypesClient.list();
+
+  return unwrap(result).meetingTypes;
+}

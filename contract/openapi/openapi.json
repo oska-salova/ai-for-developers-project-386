@@ -1,0 +1,159 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Календарь звонков",
+    "version": "0.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/meeting-types": {
+      "get": {
+        "operationId": "MeetingTypes_list",
+        "description": "Список типов встреч владельца.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ со списком типов встреч.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeetingTypeList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ответ на неизвестный маршрут или отсутствующий ресурс.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorBody": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Один из кодов: validation_error, not_found, slot_conflict, internal_error."
+          },
+          "message": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorField"
+            },
+            "description": "Неверные поля запроса; заполняется только для validation_error."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Машиночитаемый код и текст ошибки."
+      },
+      "ErrorBodyEnvelope": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Единая рамка ошибок API."
+      },
+      "ErrorField": {
+        "type": "object",
+        "required": [
+          "field",
+          "message"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Имя поля тела запроса."
+          },
+          "message": {
+            "type": "string",
+            "description": "Сообщение об ошибке, которое интерфейс показывает дословно."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Поле, значение которого не прошло валидацию."
+      },
+      "MeetingType": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "durationMinutes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Шаблон бронирования: что владелец предлагает гостю."
+      },
+      "MeetingTypeList": {
+        "type": "object",
+        "required": [
+          "meetingTypes"
+        ],
+        "properties": {
+          "meetingTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MeetingType"
+            }
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Ответ со списком типов встреч."
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Локальный сервер",
+      "variables": {}
+    }
+  ]
+}

@@ -12,11 +12,21 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    // Test the production build, not the dev server.
-    command: "pnpm build && pnpm start",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  webServer: [
+    {
+      // The real backend the pages call. Seeded so the owner list has data;
+      // the booking scenario in a later ticket reuses this server.
+      command: "pnpm --dir ../backend dev:seeded",
+      url: "http://localhost:3001/health",
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+    },
+    {
+      // Test the production build, not the dev server.
+      command: "pnpm build && pnpm start",
+      url: "http://localhost:3000",
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
+    },
+  ],
 });

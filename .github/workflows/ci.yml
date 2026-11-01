@@ -17,10 +17,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Checks
+  verify:
+    name: Verify
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -39,41 +39,19 @@ jobs:
       - name: Install dependencies
         run: mise run deps
 
-      # Runs the formatter, linters, type checks, knip, secret scan and agent rules.
-      - name: Run checks
-        run: mise run check
-
-      - name: Lint commit messages
-        if: github.event_name == 'pull_request'
-        run: mise run commits
-        env:
-          COMMITLINT_FROM: ${{ github.event.pull_request.base.sha }}
-          COMMITLINT_TO: ${{ github.event.pull_request.head.sha }}
-
-  e2e:
-    name: End-to-end
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Setup mise
-        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install dependencies
-        run: mise run deps
-
       - name: Install Chromium for Playwright
         run: mise exec -- pnpm --dir frontend exec playwright install --with-deps chromium
 
-      # The Playwright config builds the frontend and starts it on port 3000.
-      - name: Run end-to-end tests
-        run: mise run e2e
+      # One command for both locally and in CI: contract drift, SDK-only audit,
+      # format, linters, types, knip, tests and the browser scenario.
+      - name: Run verify
+        run: mise run verify
+
+      - name: Lint pull request title
+        if: github.event_name == 'pull_request'
+        run: printf '%s\n' "$PR_TITLE" | commitlint
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
 
   security:
     name: Security

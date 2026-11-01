@@ -5,6 +5,10 @@
     "**/pnpm-lock.yaml",
     "**/dist/**",
     "**/.next/**",
-    "**/node_modules/**"
+    "**/node_modules/**",
+    "contract/openapi/**",
+    "contract/tsp-output/**",
+    "frontend/src/lib/api/generated/**",
+    "backend/src/generated/**"
   ]
 }

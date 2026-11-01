@@ -16,12 +16,17 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     coverage: {
       provider: "v8",
-      include: ["src/**/*.tsx"],
+      include: ["src/**/*.{ts,tsx}"],
       exclude: [
         "src/app/layout.tsx",
+        "src/**/*.test.ts",
         "src/**/*.test.tsx",
+        // Test harness, not application code.
+        "src/test/**",
         // Vendored shadcn components expose more API than the app uses.
         "src/components/ui/**",
+        // Generated from TypeSpec; drift is checked by `mise run contract:check`.
+        "src/lib/api/generated/**",
       ],
       thresholds: {
         lines: 60,
