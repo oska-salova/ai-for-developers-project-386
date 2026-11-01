@@ -3,6 +3,7 @@
     ".github/workflows/hexlet-check.yml",
     ".agents/**",
     "**/pnpm-lock.yaml",
+    "**/CHANGELOG.md",
     "**/dist/**",
     "**/.next/**",
     "**/node_modules/**",
