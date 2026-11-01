@@ -1,4 +1,5 @@
 import type { components } from "./generated/openapi.js";
+import { intervalsOverlap } from "./overlap.js";
 import { addDays, ownerDate, ownerTimeInstant, OWNER_TIMEZONE } from "./owner-time.js";
 import type { Meeting } from "./store.js";
 
@@ -33,10 +34,6 @@ export interface SlotEngineInput {
   now: Date;
 }
 
-function overlaps(busy: BusyInterval, startMs: number, endMs: number): boolean {
-  return startMs < busy.end.getTime() && endMs > busy.start.getTime();
-}
-
 function slotsForDay(date: string, input: SlotEngineInput, nowMs: number): SlotDay {
   const workdayEndMs = ownerTimeInstant(date, WORKDAY_END_MINUTES).getTime();
   const slots: Slot[] = [];
@@ -52,7 +49,9 @@ function slotsForDay(date: string, input: SlotEngineInput, nowMs: number): SlotD
     const available =
       startMs > nowMs &&
       endMs <= workdayEndMs &&
-      !input.busy.some((interval) => overlaps(interval, startMs, endMs));
+      !input.busy.some((interval) =>
+        intervalsOverlap(startMs, endMs, interval.start.getTime(), interval.end.getTime()),
+      );
 
     slots.push({ start: start.toISOString(), available });
   }

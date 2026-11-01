@@ -109,10 +109,97 @@
           }
         }
       }
+    },
+    "/api/meetings": {
+      "post": {
+        "operationId": "Meetings_create",
+        "description": "Запись гостя на свободный слот.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Успешный ответ на запись гостя.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeetingCreatedBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ответ на запрос, поля которого не прошли проверку.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ответ на неизвестный маршрут или отсутствующий ресурс.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Ответ на попытку занять уже занятый слот; без данных о чужой встрече.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMeetingRequest"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CreateMeetingRequest": {
+        "type": "object",
+        "required": [
+          "meetingTypeId",
+          "start",
+          "guestName",
+          "guestEmail"
+        ],
+        "properties": {
+          "meetingTypeId": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "description": "Мгновение начала в ISO 8601 UTC с суффиксом Z."
+          },
+          "guestName": {
+            "type": "string"
+          },
+          "guestEmail": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Поля, которые гость присылает при записи на слот."
+      },
       "CreateMeetingTypeRequest": {
         "type": "object",
         "required": [
@@ -199,6 +286,53 @@
         },
         "description": "Поле, значение которого не прошло валидацию."
       },
+      "Meeting": {
+        "type": "object",
+        "required": [
+          "id",
+          "start",
+          "guestName",
+          "guestEmail",
+          "meetingType"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "description": "Мгновение начала в ISO 8601 UTC с суффиксом Z."
+          },
+          "guestName": {
+            "type": "string"
+          },
+          "guestEmail": {
+            "type": "string"
+          },
+          "meetingType": {
+            "$ref": "#/components/schemas/MeetingTypeSummary"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Забронированный интервал в календаре владельца."
+      },
+      "MeetingCreatedBody": {
+        "type": "object",
+        "required": [
+          "meeting"
+        ],
+        "properties": {
+          "meeting": {
+            "$ref": "#/components/schemas/Meeting"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Тело успешного ответа на запись гостя."
+      },
       "MeetingType": {
         "type": "object",
         "required": [
@@ -259,6 +393,30 @@
           "not": {}
         },
         "description": "Ответ со списком типов встреч."
+      },
+      "MeetingTypeSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "durationMinutes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Сводка типа встречи внутри встречи: ссылка на неизменяемый тип, не снимок."
       },
       "Slot": {
         "type": "object",

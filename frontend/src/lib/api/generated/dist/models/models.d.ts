@@ -3,18 +3,42 @@
  */
 export type String = string;
 /**
- * Ответ со списком типов встреч.
+ * Поля, которые гость присылает при записи на слот.
  */
-export interface MeetingTypeList {
-    meetingTypes: Array<MeetingType>;
+export interface CreateMeetingRequest {
+    meetingTypeId: string;
+    /**
+     * Мгновение начала в ISO 8601 UTC с суффиксом Z.
+     */
+    start: string;
+    guestName: string;
+    guestEmail: string;
 }
 /**
- * Шаблон бронирования: что владелец предлагает гостю.
+ * Тело успешного ответа на запись гостя.
  */
-export interface MeetingType {
+export interface MeetingCreatedBody {
+    meeting: Meeting;
+}
+/**
+ * Забронированный интервал в календаре владельца.
+ */
+export interface Meeting {
+    id: string;
+    /**
+     * Мгновение начала в ISO 8601 UTC с суффиксом Z.
+     */
+    start: string;
+    guestName: string;
+    guestEmail: string;
+    meetingType: MeetingTypeSummary;
+}
+/**
+ * Сводка типа встречи внутри встречи: ссылка на неизменяемый тип, не снимок.
+ */
+export interface MeetingTypeSummary {
     id: string;
     name: string;
-    description: string;
     durationMinutes: number;
 }
 /**
@@ -66,6 +90,21 @@ export interface ErrorField {
      * Сообщение об ошибке, которое интерфейс показывает дословно.
      */
     message: string;
+}
+/**
+ * Ответ со списком типов встреч.
+ */
+export interface MeetingTypeList {
+    meetingTypes: Array<MeetingType>;
+}
+/**
+ * Шаблон бронирования: что владелец предлагает гостю.
+ */
+export interface MeetingType {
+    id: string;
+    name: string;
+    description: string;
+    durationMinutes: number;
 }
 /**
  * Поля, которые владелец присылает при создании типа встречи.

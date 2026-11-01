@@ -39,10 +39,37 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/meetings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Запись гостя на свободный слот. */
+        post: operations["Meetings_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description Поля, которые гость присылает при записи на слот. */
+        CreateMeetingRequest: {
+            meetingTypeId: string;
+            /** @description Мгновение начала в ISO 8601 UTC с суффиксом Z. */
+            start: string;
+            guestName: string;
+            guestEmail: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** @description Поля, которые владелец присылает при создании типа встречи. */
         CreateMeetingTypeRequest: {
             name: string;
@@ -77,6 +104,23 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** @description Забронированный интервал в календаре владельца. */
+        Meeting: {
+            id: string;
+            /** @description Мгновение начала в ISO 8601 UTC с суффиксом Z. */
+            start: string;
+            guestName: string;
+            guestEmail: string;
+            meetingType: components["schemas"]["MeetingTypeSummary"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Тело успешного ответа на запись гостя. */
+        MeetingCreatedBody: {
+            meeting: components["schemas"]["Meeting"];
+        } & {
+            [key: string]: unknown;
+        };
         /** @description Шаблон бронирования: что владелец предлагает гостю. */
         MeetingType: {
             id: string;
@@ -96,6 +140,15 @@ export interface components {
         /** @description Ответ со списком типов встреч. */
         MeetingTypeList: {
             meetingTypes: components["schemas"]["MeetingType"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Сводка типа встречи внутри встречи: ссылка на неизменяемый тип, не снимок. */
+        MeetingTypeSummary: {
+            id: string;
+            name: string;
+            /** Format: int32 */
+            durationMinutes: number;
         } & {
             [key: string]: unknown;
         };
@@ -229,6 +282,57 @@ export interface operations {
             };
             /** @description Ответ на неизвестный маршрут или отсутствующий ресурс. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
+        };
+    };
+    Meetings_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMeetingRequest"];
+            };
+        };
+        responses: {
+            /** @description Успешный ответ на запись гостя. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeetingCreatedBody"];
+                };
+            };
+            /** @description Ответ на запрос, поля которого не прошли проверку. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
+            /** @description Ответ на неизвестный маршрут или отсутствующий ресурс. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
+            /** @description Ответ на попытку занять уже занятый слот; без данных о чужой встрече. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

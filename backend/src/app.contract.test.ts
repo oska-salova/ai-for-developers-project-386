@@ -97,6 +97,27 @@ function makeSlotsApp() {
   };
 }
 
+function makeMeetingsApp() {
+  const store = createStore();
+  const meetingType = store.createMeetingType({
+    name: "Кофе с гостем",
+    description: "Короткий разговор о задаче",
+    durationMinutes: 30,
+  });
+
+  return {
+    app: createApp({ store, now: () => new Date("2026-11-01T09:00:00.000Z") }),
+    meetingTypeId: meetingType.id,
+  };
+}
+
+const validMeeting = (meetingTypeId: string) => ({
+  meetingTypeId,
+  start: "2026-11-02T10:00:00.000Z",
+  guestName: "Иван Иванов",
+  guestEmail: "guest@example.com",
+});
+
 describe("contract compliance", () => {
   it("validates the 200 body of GET /api/meeting-types", async () => {
     const response = await request(makeApp()).get("/api/meeting-types");
@@ -194,5 +215,57 @@ describe("contract compliance", () => {
     await expect(
       validateResponse("/api/meeting-types/{id}/slots", "get", 200, body),
     ).rejects.toThrow();
+  });
+
+  it("validates the 201 body of POST /api/meetings", async () => {
+    const { app, meetingTypeId } = makeMeetingsApp();
+
+    const response = await request(app).post("/api/meetings").send(validMeeting(meetingTypeId));
+
+    expect(response.status).toBe(201);
+    await validateResponse("/api/meetings", "post", response.status, response.body);
+  });
+
+  it("validates the 400 body of POST /api/meetings with invalid fields", async () => {
+    const { app, meetingTypeId } = makeMeetingsApp();
+
+    const response = await request(app)
+      .post("/api/meetings")
+      .send({ ...validMeeting(meetingTypeId), guestEmail: "not-an-email" });
+
+    expect(response.status).toBe(400);
+    await validateResponse("/api/meetings", "post", response.status, response.body);
+  });
+
+  it("validates the 400 body of POST /api/meetings with a malformed JSON body", async () => {
+    const { app } = makeMeetingsApp();
+
+    const response = await request(app)
+      .post("/api/meetings")
+      .set("content-type", "application/json")
+      .send('{"meetingTypeId": ');
+
+    expect(response.status).toBe(400);
+    await validateResponse("/api/meetings", "post", response.status, response.body);
+  });
+
+  it("validates the 404 body of POST /api/meetings with an unknown meeting type", async () => {
+    const { app } = makeMeetingsApp();
+
+    const response = await request(app).post("/api/meetings").send(validMeeting("missing"));
+
+    expect(response.status).toBe(404);
+    await validateResponse("/api/meetings", "post", response.status, response.body);
+  });
+
+  it("validates the 409 body of POST /api/meetings on a taken slot", async () => {
+    const { app, meetingTypeId } = makeMeetingsApp();
+
+    await request(app).post("/api/meetings").send(validMeeting(meetingTypeId));
+
+    const response = await request(app).post("/api/meetings").send(validMeeting(meetingTypeId));
+
+    expect(response.status).toBe(409);
+    await validateResponse("/api/meetings", "post", response.status, response.body);
   });
 });

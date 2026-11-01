@@ -1,12 +1,16 @@
 import type { HttpClient } from "@typespec/ts-http-runtime";
 import {
   CallCalendarClient,
+  type CreateMeetingRequest,
   type ErrorBody,
   type ErrorBodyEnvelope,
+  type Meeting,
   type MeetingType,
+  type SlotDay,
+  type SlotsEnvelope,
 } from "./api/generated/dist/index.js";
 
-export type { MeetingType };
+export type { Meeting, MeetingType, SlotDay, SlotsEnvelope };
 
 /** Where the SDK talks to the backend when NEXT_PUBLIC_API_URL is not set. */
 const DEFAULT_API_URL = "http://localhost:3001";
@@ -82,4 +86,20 @@ export async function createMeetingType(input: NewMeetingTypeInput): Promise<Mee
   const result = await apiClient.meetingTypesClient.create(input);
 
   return unwrap(result).meetingType;
+}
+
+/** The full 14-day slot envelope for a meeting type. */
+export async function listSlots(meetingTypeId: string): Promise<SlotsEnvelope> {
+  const result = await apiClient.meetingTypesClient.slots(meetingTypeId);
+
+  return unwrap(result);
+}
+
+/** The fields the guest fills in when booking a slot. */
+export type NewMeetingInput = CreateMeetingRequest;
+
+export async function createMeeting(input: NewMeetingInput): Promise<Meeting> {
+  const result = await apiClient.meetingsClient.create(input);
+
+  return unwrap(result).meeting;
 }

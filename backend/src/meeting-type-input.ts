@@ -1,5 +1,7 @@
+import { asRecord, readField } from "./body-input.js";
 import type { components } from "./generated/openapi.js";
 import type { NewMeetingType } from "./store.js";
+import { normalizeSpaces } from "./text.js";
 
 type ErrorField = components["schemas"]["ErrorField"];
 
@@ -28,27 +30,6 @@ const FIELD_MESSAGES = {
 export type CreateMeetingTypeResult =
   | { ok: true; value: NewMeetingType }
   | { ok: false; fields: ErrorField[] };
-
-/** Trims the edges and collapses inner whitespace into single spaces. */
-function normalizeSpaces(value: string): string {
-  return value.replace(/\s+/gu, " ").trim();
-}
-
-/**
- * The value of a field, or `undefined` when the key is absent. `null` counts
- * as absent, and keys outside the contract are simply not read.
- */
-function readField(body: Record<string, unknown>, key: string): unknown {
-  const value = Object.hasOwn(body, key) ? body[key] : undefined;
-
-  return value ?? undefined;
-}
-
-function asRecord(body: unknown): Record<string, unknown> {
-  return typeof body === "object" && body !== null && !Array.isArray(body)
-    ? (body as Record<string, unknown>)
-    : {};
-}
 
 interface NameField {
   name?: string;

@@ -109,6 +109,51 @@ model SlotsOkResponse {
   @body body: SlotsEnvelope;
 }
 
+/** Сводка типа встречи внутри встречи: ссылка на неизменяемый тип, не снимок. */
+model MeetingTypeSummary {
+  id: string;
+  name: string;
+  durationMinutes: int32;
+}
+
+/** Забронированный интервал в календаре владельца. */
+model Meeting {
+  id: string;
+  /** Мгновение начала в ISO 8601 UTC с суффиксом Z. */
+  start: string;
+  guestName: string;
+  guestEmail: string;
+  meetingType: MeetingTypeSummary;
+}
+
+/** Поля, которые гость присылает при записи на слот. */
+model CreateMeetingRequest {
+  meetingTypeId: string;
+  /** Мгновение начала в ISO 8601 UTC с суффиксом Z. */
+  start: string;
+  guestName: string;
+  guestEmail: string;
+}
+
+/** Тело успешного ответа на запись гостя. */
+model MeetingCreatedBody {
+  meeting: Meeting;
+}
+
+/** Успешный ответ на запись гостя. */
+model MeetingCreatedResponse {
+  @statusCode statusCode: 201;
+  @header("content-type") contentType: "application/json";
+  @body body: MeetingCreatedBody;
+}
+
+/** Ответ на попытку занять уже занятый слот; без данных о чужой встрече. */
+model SlotConflictResponse {
+  @statusCode statusCode: 409;
+  @header("content-type") contentType: "application/json";
+  @body body: ErrorBodyEnvelope;
+}
+
 /** Ответ на запрос, поля которого не прошли проверку. */
 model ValidationErrorResponse {
   @statusCode statusCode: 400;
@@ -121,6 +166,17 @@ model NotFoundResponse {
   @statusCode statusCode: 404;
   @header("content-type") contentType: "application/json";
   @body body: ErrorBodyEnvelope;
+}
+
+@route("/api/meetings")
+interface Meetings {
+  /** Запись гостя на свободный слот. */
+  @post
+  create(@body body: CreateMeetingRequest):
+    | MeetingCreatedResponse
+    | ValidationErrorResponse
+    | NotFoundResponse
+    | SlotConflictResponse;
 }
 
 @route("/api/meeting-types")

@@ -4,26 +4,40 @@ import {
   createCallCalendarClientContext,
 } from "./api/callCalendarClientContext.js";
 import {
+  createMeetingsClientContext,
+  type MeetingsClientContext,
+  type MeetingsClientOptions,
+} from "./api/meetingsClient/meetingsClientContext.js";
+import {
+  create,
+  type CreateOptions,
+} from "./api/meetingsClient/meetingsClientOperations.js";
+import {
   createMeetingTypesClientContext,
   type MeetingTypesClientContext,
   type MeetingTypesClientOptions,
 } from "./api/meetingTypesClient/meetingTypesClientContext.js";
 import {
-  create,
-  type CreateOptions,
+  create as create_2,
+  type CreateOptions as CreateOptions_2,
   list,
   type ListOptions,
   slots,
   type SlotsOptions,
 } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
-import type { CreateMeetingTypeRequest } from "./models/models.js";
+import type {
+  CreateMeetingRequest,
+  CreateMeetingTypeRequest,
+} from "./models/models.js";
 
 export class CallCalendarClient {
   #context: CallCalendarClientContext
+  meetingsClient: MeetingsClient;
   meetingTypesClient: MeetingTypesClient
   constructor(options?: CallCalendarClientOptions) {
     this.#context = createCallCalendarClientContext(options);
-    this.meetingTypesClient = new MeetingTypesClient(options);
+    this.meetingsClient = new MeetingsClient(options);;this
+      .meetingTypesClient = new MeetingTypesClient(options);
   }
 }
 export class MeetingTypesClient {
@@ -35,10 +49,20 @@ export class MeetingTypesClient {
   async list(options?: ListOptions) {
     return list(this.#context, options);
   };
-  async create(body: CreateMeetingTypeRequest, options?: CreateOptions) {
-    return create(this.#context, body, options);
+  async create(body: CreateMeetingTypeRequest, options?: CreateOptions_2) {
+    return create_2(this.#context, body, options);
   };
   async slots(id: string, options?: SlotsOptions) {
     return slots(this.#context, id, options);
+  }
+}
+export class MeetingsClient {
+  #context: MeetingsClientContext
+  constructor(options?: MeetingsClientOptions) {
+    this.#context = createMeetingsClientContext(options);
+
+  }
+  async create(body: CreateMeetingRequest, options?: CreateOptions) {
+    return create(this.#context, body, options);
   }
 }

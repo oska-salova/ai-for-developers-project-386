@@ -1,11 +1,15 @@
 import type {
+  CreateMeetingRequest,
   CreateMeetingTypeRequest,
   ErrorBody,
   ErrorBodyEnvelope,
   ErrorField,
+  Meeting,
+  MeetingCreatedBody,
   MeetingType,
   MeetingTypeCreatedBody,
   MeetingTypeList,
+  MeetingTypeSummary,
   Slot,
   SlotDay,
   SlotsEnvelope,
@@ -67,69 +71,75 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   return new Date(date * 1000);
 }export function createPayloadToTransport(payload: CreateMeetingTypeRequest) {
   return jsonCreateMeetingTypeRequestToTransportTransform(payload)!;
-}export function jsonMeetingTypeListToTransportTransform(
-  input_?: MeetingTypeList | null,
+}export function createPayloadToTransport_2(payload: CreateMeetingRequest) {
+  return jsonCreateMeetingRequestToTransportTransform(payload)!;
+}export function jsonCreateMeetingRequestToTransportTransform(
+  input_?: CreateMeetingRequest | null,
 ): any {
   if(!input_) {
     return input_ as any;
   }
     return {
-    meetingTypes: jsonArrayMeetingTypeToTransportTransform(input_.meetingTypes)
+    meetingTypeId: input_.meetingTypeId,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail
   }!;
-}export function jsonMeetingTypeListToApplicationTransform(
+}export function jsonCreateMeetingRequestToApplicationTransform(
   input_?: any,
-): MeetingTypeList {
+): CreateMeetingRequest {
   if(!input_) {
     return input_ as any;
   }
     return {
-    meetingTypes: jsonArrayMeetingTypeToApplicationTransform(input_.meetingTypes)
+    meetingTypeId: input_.meetingTypeId,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail
   }!;
-}export function jsonArrayMeetingTypeToTransportTransform(
-  items_?: Array<MeetingType> | null,
-): any {
-  if(!items_) {
-    return items_ as any;
-  }
-  const _transformedArray = [];
-
-  for (const item of items_ ?? []) {
-    const transformedItem = jsonMeetingTypeToTransportTransform(item as any);
-    _transformedArray.push(transformedItem);
-  }
-
-  return _transformedArray as any;
-}export function jsonArrayMeetingTypeToApplicationTransform(
-  items_?: any,
-): Array<MeetingType> {
-  if(!items_) {
-    return items_ as any;
-  }
-  const _transformedArray = [];
-
-  for (const item of items_ ?? []) {
-    const transformedItem = jsonMeetingTypeToApplicationTransform(item as any);
-    _transformedArray.push(transformedItem);
-  }
-
-  return _transformedArray as any;
-}export function jsonMeetingTypeToTransportTransform(
-  input_?: MeetingType | null,
+}export function jsonMeetingCreatedBodyToTransportTransform(
+  input_?: MeetingCreatedBody | null,
 ): any {
   if(!input_) {
     return input_ as any;
   }
     return {
-    id: input_.id,name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
+    meeting: jsonMeetingToTransportTransform(input_.meeting)
   }!;
-}export function jsonMeetingTypeToApplicationTransform(
+}export function jsonMeetingCreatedBodyToApplicationTransform(
   input_?: any,
-): MeetingType {
+): MeetingCreatedBody {
   if(!input_) {
     return input_ as any;
   }
     return {
-    id: input_.id,name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
+    meeting: jsonMeetingToApplicationTransform(input_.meeting)
+  }!;
+}export function jsonMeetingToTransportTransform(input_?: Meeting | null): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail,meetingType: jsonMeetingTypeSummaryToTransportTransform(input_.meetingType)
+  }!;
+}export function jsonMeetingToApplicationTransform(input_?: any): Meeting {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,start: input_.start,guestName: input_.guestName,guestEmail: input_.guestEmail,meetingType: jsonMeetingTypeSummaryToApplicationTransform(input_.meetingType)
+  }!;
+}export function jsonMeetingTypeSummaryToTransportTransform(
+  input_?: MeetingTypeSummary | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,durationMinutes: input_.durationMinutes
+  }!;
+}export function jsonMeetingTypeSummaryToApplicationTransform(
+  input_?: any,
+): MeetingTypeSummary {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,durationMinutes: input_.durationMinutes
   }!;
 }export function jsonErrorBodyEnvelopeToTransportTransform(
   input_?: ErrorBodyEnvelope | null,
@@ -210,6 +220,70 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   }
     return {
     field: input_.field,message: input_.message
+  }!;
+}export function jsonMeetingTypeListToTransportTransform(
+  input_?: MeetingTypeList | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingTypes: jsonArrayMeetingTypeToTransportTransform(input_.meetingTypes)
+  }!;
+}export function jsonMeetingTypeListToApplicationTransform(
+  input_?: any,
+): MeetingTypeList {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    meetingTypes: jsonArrayMeetingTypeToApplicationTransform(input_.meetingTypes)
+  }!;
+}export function jsonArrayMeetingTypeToTransportTransform(
+  items_?: Array<MeetingType> | null,
+): any {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonMeetingTypeToTransportTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonArrayMeetingTypeToApplicationTransform(
+  items_?: any,
+): Array<MeetingType> {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonMeetingTypeToApplicationTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonMeetingTypeToTransportTransform(
+  input_?: MeetingType | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
+  }!;
+}export function jsonMeetingTypeToApplicationTransform(
+  input_?: any,
+): MeetingType {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    id: input_.id,name: input_.name,description: input_.description,durationMinutes: input_.durationMinutes
   }!;
 }export function jsonCreateMeetingTypeRequestToTransportTransform(
   input_?: CreateMeetingTypeRequest | null,
