@@ -26,15 +26,20 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          # commitlint compares against the pull request base, which a shallow
-          # clone does not contain.
-          fetch-depth: 0
 
       # Installs the tools pinned in mise.toml — the same ones used locally.
       - name: Setup mise
         uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Cheap and independent of the code: fail on a non-Conventional PR title
+      # before the heavy steps run. Only the title is checked, not `(#N)`.
+      - name: Lint pull request title
+        if: github.event_name == 'pull_request'
+        run: printf '%s\n' "$PR_TITLE" | commitlint
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
 
       - name: Install dependencies
         run: mise run deps
@@ -46,12 +51,6 @@ jobs:
       # format, linters, types, knip, tests and the browser scenario.
       - name: Run verify
         run: mise run verify
-
-      - name: Lint pull request title
-        if: github.event_name == 'pull_request'
-        run: printf '%s\n' "$PR_TITLE" | commitlint
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
 
   security:
     name: Security

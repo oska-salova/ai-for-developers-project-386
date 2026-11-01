@@ -87,6 +87,13 @@
 
 ## Коммиты
 
-- Conventional Commits обязательны: commit-msg хук и CI диапазона PR. Разрешённые типы: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`.
+- Conventional Commits обязательны: commit-msg хук `hk` локально и шаг «Lint pull request title» в джобе Verify. Заголовок PR проверяется тем же `commitlint` и конфигом `commitlint.config.mjs`. Разрешённые типы: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`.
 - Заголовки PR — те же Conventional Commits: при squash-merge заголовок становится коммитом в `main`, а release-please читает именно его.
-- Коммит реализации ссылается на тикет, который он закрывает, для трассируемости: `feat: запись на свободный слот (#12)`. Номер нужен только для истории; issue закрывает трекер, а не сообщение коммита, и механической проверки `(#N)` нет. Релизные коммиты release-please и dependabot — без ссылки. При squash-merge ссылку желательно сохранить в заголовке PR.
+- Коммит реализации ссылается на тикет, который он закрывает, для трассируемости: `feat: запись на свободный слот (#12)`. Номер нужен только для истории; issue закрывает трекер, а не сообщение коммита, и механической проверки `(#N)` нет.
+- Релизные коммиты release-please и dependabot — без ссылки на тикет. При squash-merge ссылку на тикет желательно сохранить в заголовке PR.
+
+## Релизы
+
+- `.github/workflows/release-please.yml` на `push` в `main` готовит release-PR по Conventional Commits. `release-please-config.json` описывает два пакета (`backend`, `frontend`) с отдельными PR, текущие версии — в `.release-please-manifest.json`, `bootstrap-sha` отсекает историю до первого среза.
+- Апрувит и мержит человек: action только создаёт и обновляет PR. Права выданы явно в джобе (`contents`, `issues`, `pull-requests` — `write`), default permissions репозитория остаются `read`; PAT и GitHub App не используются.
+- Release-PR создаётся через `GITHUB_TOKEN`, поэтому CI на нём не запускается — это известное ограничение, а не поломка. Если включать branch protection, требовать только PR и апрув, без required checks.
