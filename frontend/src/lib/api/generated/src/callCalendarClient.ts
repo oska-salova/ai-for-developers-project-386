@@ -13,6 +13,8 @@ import {
   type CreateOptions,
   list,
   type ListOptions,
+  slots,
+  type SlotsOptions,
 } from "./api/meetingTypesClient/meetingTypesClientOperations.js";
 import type { CreateMeetingTypeRequest } from "./models/models.js";
 
@@ -35,5 +37,8 @@ export class MeetingTypesClient {
   };
   async create(body: CreateMeetingTypeRequest, options?: CreateOptions) {
     return create(this.#context, body, options);
+  };
+  async slots(id: string, options?: SlotsOptions) {
+    return slots(this.#context, id, options);
   }
 }

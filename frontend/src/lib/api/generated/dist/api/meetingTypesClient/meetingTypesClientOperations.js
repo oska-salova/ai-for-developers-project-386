@@ -1,6 +1,6 @@
 import { parse } from "uri-template";
 import { createRestError } from "../../helpers/error.js";
-import { jsonCreateMeetingTypeRequestToTransportTransform, jsonErrorBodyEnvelopeToApplicationTransform, jsonMeetingTypeCreatedBodyToApplicationTransform, jsonMeetingTypeListToApplicationTransform, } from "../../models/internal/serializers.js";
+import { jsonCreateMeetingTypeRequestToTransportTransform, jsonErrorBodyEnvelopeToApplicationTransform, jsonMeetingTypeCreatedBodyToApplicationTransform, jsonMeetingTypeListToApplicationTransform, jsonSlotsEnvelopeToApplicationTransform, } from "../../models/internal/serializers.js";
 /**
  * Список типов встреч владельца.
  *
@@ -45,6 +45,33 @@ export async function create(client, body, options) {
         return jsonMeetingTypeCreatedBodyToApplicationTransform(response.body);
     }
     if (+response.status === 400 && response.headers["content-type"]?.includes("application/json")) {
+        return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
+    }
+    throw createRestError(response);
+}
+;
+/**
+ * Полная сетка слотов типа встречи на окно записи.
+ *
+ * @param {MeetingTypesClientContext} client
+ * @param {string} id
+ * @param {SlotsOptions} [options]
+ */
+export async function slots(client, id, options) {
+    const path = parse("/api/meeting-types/{id}/slots").expand({
+        id: id
+    });
+    const httpRequestOptions = {
+        headers: {},
+    };
+    const response = await client.pathUnchecked(path).get(httpRequestOptions);
+    if (typeof options?.operationOptions?.onResponse === "function") {
+        options?.operationOptions?.onResponse(response);
+    }
+    if (+response.status === 200 && response.headers["content-type"]?.includes("application/json")) {
+        return jsonSlotsEnvelopeToApplicationTransform(response.body);
+    }
+    if (+response.status === 404 && response.headers["content-type"]?.includes("application/json")) {
         return jsonErrorBodyEnvelopeToApplicationTransform(response.body);
     }
     throw createRestError(response);

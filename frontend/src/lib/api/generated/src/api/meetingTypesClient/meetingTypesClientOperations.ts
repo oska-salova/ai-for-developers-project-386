@@ -7,12 +7,14 @@ import {
   jsonErrorBodyEnvelopeToApplicationTransform,
   jsonMeetingTypeCreatedBodyToApplicationTransform,
   jsonMeetingTypeListToApplicationTransform,
+  jsonSlotsEnvelopeToApplicationTransform,
 } from "../../models/internal/serializers.js";
 import {
   CreateMeetingTypeRequest,
   type ErrorBodyEnvelope,
   type MeetingTypeCreatedBody,
   type MeetingTypeList,
+  type SlotsEnvelope,
 } from "../../models/models.js";
 
 export interface ListOptions extends OperationOptions {}
@@ -72,6 +74,40 @@ export async function create(
     return jsonMeetingTypeCreatedBodyToApplicationTransform(response.body)!;
   }
   if (+response.status === 400 && response.headers["content-type"]?.includes("application/json")) {
+    return jsonErrorBodyEnvelopeToApplicationTransform(response.body)!;
+  }
+  throw createRestError(response);
+}
+;
+export interface SlotsOptions extends OperationOptions {}
+/**
+ * Полная сетка слотов типа встречи на окно записи.
+ *
+ * @param {MeetingTypesClientContext} client
+ * @param {string} id
+ * @param {SlotsOptions} [options]
+ */
+export async function slots(
+  client: MeetingTypesClientContext,
+  id: string,
+  options?: SlotsOptions,
+): Promise<SlotsEnvelope | ErrorBodyEnvelope> {
+  const path = parse("/api/meeting-types/{id}/slots").expand({
+    id: id
+  });
+  const httpRequestOptions = {
+    headers: {},
+  };
+  const response = await client.pathUnchecked(path).get(httpRequestOptions);
+
+
+  if (typeof options?.operationOptions?.onResponse === "function") {
+    options?.operationOptions?.onResponse(response);
+  }
+  if (+response.status === 200 && response.headers["content-type"]?.includes("application/json")) {
+    return jsonSlotsEnvelopeToApplicationTransform(response.body)!;
+  }
+  if (+response.status === 404 && response.headers["content-type"]?.includes("application/json")) {
     return jsonErrorBodyEnvelopeToApplicationTransform(response.body)!;
   }
   throw createRestError(response);

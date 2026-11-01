@@ -6,6 +6,7 @@ import {
   parseCreateMeetingType,
   VALIDATION_MESSAGE,
 } from "./meeting-type-input.js";
+import { buildSlots, busyIntervalsFromMeetings } from "./slots.js";
 import type { MeetingTypeStore } from "./store.js";
 
 const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
@@ -36,7 +37,7 @@ function isMalformedJson(error: unknown): boolean {
  * Builds the HTTP app around its dependencies. Tests get a fresh store and a
  * fixed clock per test; the server entry point passes the real ones.
  */
-export function createApp({ store }: AppDependencies): Express {
+export function createApp({ store, now }: AppDependencies): Express {
   const app = express();
 
   app.use(
@@ -78,6 +79,27 @@ export function createApp({ store }: AppDependencies): Express {
     };
 
     res.status(201).json(body);
+  });
+
+  app.get("/api/meeting-types/:id/slots", (req, res) => {
+    const meetingType = store.findMeetingType(req.params.id);
+
+    if (meetingType === undefined) {
+      res.status(404).json(errorEnvelope("not_found", "Тип встречи не найден"));
+
+      return;
+    }
+
+    const body = buildSlots({
+      durationMinutes: meetingType.durationMinutes,
+      busy: busyIntervalsFromMeetings(
+        store.listMeetings(),
+        (meetingTypeId) => store.findMeetingType(meetingTypeId)?.durationMinutes,
+      ),
+      now: now(),
+    });
+
+    res.status(200).json(body);
   });
 
   app.use((_req, res) => {

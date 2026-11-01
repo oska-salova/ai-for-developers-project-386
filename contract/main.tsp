@@ -69,6 +69,46 @@ model MeetingTypeCreatedResponse {
   @body body: MeetingTypeCreatedBody;
 }
 
+/** Границы окна записи в календарных днях владельца. */
+model SlotWindow {
+  /** Первый день окна, YYYY-MM-DD в зоне владельца. */
+  start: string;
+  /** Последний день окна включительно, YYYY-MM-DD в зоне владельца. */
+  end: string;
+}
+
+/** Старт встречи в сетке слотов. */
+model Slot {
+  /** Мгновение начала в ISO 8601 UTC с суффиксом Z. */
+  start: string;
+  /** Можно ли записаться на этот старт. */
+  available: boolean;
+}
+
+/** Полная сетка стартов одного календарного дня владельца. */
+model SlotDay {
+  /** Календарный день владельца, YYYY-MM-DD. */
+  date: string;
+  /** Старты каждые 15 минут с 09:00 по 17:45. */
+  slots: Slot[];
+}
+
+/** Окно записи, часовой пояс владельца и дни с полной сеткой стартов. */
+model SlotsEnvelope {
+  window: SlotWindow;
+  /** Часовая зона владельца: Europe/Moscow. */
+  timezone: string;
+  /** Ровно 14 дней окна, начиная с сегодняшнего. */
+  days: SlotDay[];
+}
+
+/** Успешный ответ с сеткой слотов типа встречи. */
+model SlotsOkResponse {
+  @statusCode statusCode: 200;
+  @header("content-type") contentType: "application/json";
+  @body body: SlotsEnvelope;
+}
+
 /** Ответ на запрос, поля которого не прошли проверку. */
 model ValidationErrorResponse {
   @statusCode statusCode: 400;
@@ -93,4 +133,9 @@ interface MeetingTypes {
   @post
   create(@body body: CreateMeetingTypeRequest):
     MeetingTypeCreatedResponse | ValidationErrorResponse;
+
+  /** Полная сетка слотов типа встречи на окно записи. */
+  @get
+  @route("/{id}/slots")
+  slots(@path id: string): SlotsOkResponse | NotFoundResponse;
 }

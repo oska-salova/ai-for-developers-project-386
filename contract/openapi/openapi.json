@@ -71,6 +71,44 @@
           }
         }
       }
+    },
+    "/api/meeting-types/{id}/slots": {
+      "get": {
+        "operationId": "MeetingTypes_slots",
+        "description": "Полная сетка слотов типа встречи на окно записи.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ с сеткой слотов типа встречи.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlotsEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ответ на неизвестный маршрут или отсутствующий ресурс.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBodyEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -221,6 +259,100 @@
           "not": {}
         },
         "description": "Ответ со списком типов встреч."
+      },
+      "Slot": {
+        "type": "object",
+        "required": [
+          "start",
+          "available"
+        ],
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "Мгновение начала в ISO 8601 UTC с суффиксом Z."
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Можно ли записаться на этот старт."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Старт встречи в сетке слотов."
+      },
+      "SlotDay": {
+        "type": "object",
+        "required": [
+          "date",
+          "slots"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Календарный день владельца, YYYY-MM-DD."
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "description": "Старты каждые 15 минут с 09:00 по 17:45."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Полная сетка стартов одного календарного дня владельца."
+      },
+      "SlotWindow": {
+        "type": "object",
+        "required": [
+          "start",
+          "end"
+        ],
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "Первый день окна, YYYY-MM-DD в зоне владельца."
+          },
+          "end": {
+            "type": "string",
+            "description": "Последний день окна включительно, YYYY-MM-DD в зоне владельца."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Границы окна записи в календарных днях владельца."
+      },
+      "SlotsEnvelope": {
+        "type": "object",
+        "required": [
+          "window",
+          "timezone",
+          "days"
+        ],
+        "properties": {
+          "window": {
+            "$ref": "#/components/schemas/SlotWindow"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Часовая зона владельца: Europe/Moscow."
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SlotDay"
+            },
+            "description": "Ровно 14 дней окна, начиная с сегодняшнего."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": "Окно записи, часовой пояс владельца и дни с полной сеткой стартов."
       }
     }
   },

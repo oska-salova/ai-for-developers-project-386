@@ -22,6 +22,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/meeting-types/{id}/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Полная сетка слотов типа встречи на окно записи. */
+        get: operations["MeetingTypes_slots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -79,6 +96,43 @@ export interface components {
         /** @description Ответ со списком типов встреч. */
         MeetingTypeList: {
             meetingTypes: components["schemas"]["MeetingType"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Старт встречи в сетке слотов. */
+        Slot: {
+            /** @description Мгновение начала в ISO 8601 UTC с суффиксом Z. */
+            start: string;
+            /** @description Можно ли записаться на этот старт. */
+            available: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Полная сетка стартов одного календарного дня владельца. */
+        SlotDay: {
+            /** @description Календарный день владельца, YYYY-MM-DD. */
+            date: string;
+            /** @description Старты каждые 15 минут с 09:00 по 17:45. */
+            slots: components["schemas"]["Slot"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Границы окна записи в календарных днях владельца. */
+        SlotWindow: {
+            /** @description Первый день окна, YYYY-MM-DD в зоне владельца. */
+            start: string;
+            /** @description Последний день окна включительно, YYYY-MM-DD в зоне владельца. */
+            end: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Окно записи, часовой пояс владельца и дни с полной сеткой стартов. */
+        SlotsEnvelope: {
+            window: components["schemas"]["SlotWindow"];
+            /** @description Часовая зона владельца: Europe/Moscow. */
+            timezone: string;
+            /** @description Ровно 14 дней окна, начиная с сегодняшнего. */
+            days: components["schemas"]["SlotDay"][];
         } & {
             [key: string]: unknown;
         };
@@ -144,6 +198,37 @@ export interface operations {
             };
             /** @description Ответ на запрос, поля которого не прошли проверку. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBodyEnvelope"];
+                };
+            };
+        };
+    };
+    MeetingTypes_slots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Успешный ответ с сеткой слотов типа встречи. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SlotsEnvelope"];
+                };
+            };
+            /** @description Ответ на неизвестный маршрут или отсутствующий ресурс. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -208,3 +208,111 @@ export function jsonMeetingTypeCreatedBodyToApplicationTransform(input_) {
         meetingType: jsonMeetingTypeToApplicationTransform(input_.meetingType)
     };
 }
+export function jsonSlotsEnvelopeToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        window: jsonSlotWindowToTransportTransform(input_.window), timezone: input_.timezone, days: jsonArraySlotDayToTransportTransform(input_.days)
+    };
+}
+export function jsonSlotsEnvelopeToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        window: jsonSlotWindowToApplicationTransform(input_.window), timezone: input_.timezone, days: jsonArraySlotDayToApplicationTransform(input_.days)
+    };
+}
+export function jsonSlotWindowToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        start: input_.start, end: input_.end
+    };
+}
+export function jsonSlotWindowToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        start: input_.start, end: input_.end
+    };
+}
+export function jsonArraySlotDayToTransportTransform(items_) {
+    if (!items_) {
+        return items_;
+    }
+    const _transformedArray = [];
+    for (const item of items_ ?? []) {
+        const transformedItem = jsonSlotDayToTransportTransform(item);
+        _transformedArray.push(transformedItem);
+    }
+    return _transformedArray;
+}
+export function jsonArraySlotDayToApplicationTransform(items_) {
+    if (!items_) {
+        return items_;
+    }
+    const _transformedArray = [];
+    for (const item of items_ ?? []) {
+        const transformedItem = jsonSlotDayToApplicationTransform(item);
+        _transformedArray.push(transformedItem);
+    }
+    return _transformedArray;
+}
+export function jsonSlotDayToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        date: input_.date, slots: jsonArraySlotToTransportTransform(input_.slots)
+    };
+}
+export function jsonSlotDayToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        date: input_.date, slots: jsonArraySlotToApplicationTransform(input_.slots)
+    };
+}
+export function jsonArraySlotToTransportTransform(items_) {
+    if (!items_) {
+        return items_;
+    }
+    const _transformedArray = [];
+    for (const item of items_ ?? []) {
+        const transformedItem = jsonSlotToTransportTransform(item);
+        _transformedArray.push(transformedItem);
+    }
+    return _transformedArray;
+}
+export function jsonArraySlotToApplicationTransform(items_) {
+    if (!items_) {
+        return items_;
+    }
+    const _transformedArray = [];
+    for (const item of items_ ?? []) {
+        const transformedItem = jsonSlotToApplicationTransform(item);
+        _transformedArray.push(transformedItem);
+    }
+    return _transformedArray;
+}
+export function jsonSlotToTransportTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        start: input_.start, available: input_.available
+    };
+}
+export function jsonSlotToApplicationTransform(input_) {
+    if (!input_) {
+        return input_;
+    }
+    return {
+        start: input_.start, available: input_.available
+    };
+}

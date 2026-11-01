@@ -1,4 +1,4 @@
-import type { CreateMeetingTypeRequest, ErrorBody, ErrorBodyEnvelope, ErrorField, MeetingType, MeetingTypeCreatedBody, MeetingTypeList } from "../models.js";
+import type { CreateMeetingTypeRequest, ErrorBody, ErrorBodyEnvelope, ErrorField, MeetingType, MeetingTypeCreatedBody, MeetingTypeList, Slot, SlotDay, SlotsEnvelope, SlotWindow } from "../models.js";
 export declare function decodeBase64(value: string): Uint8Array | undefined;
 export declare function encodeUint8Array(value: Uint8Array | undefined | null, encoding: BufferEncoding): string | undefined;
 export declare function dateDeserializer(date?: string | null): Date;
@@ -26,3 +26,15 @@ export declare function jsonCreateMeetingTypeRequestToTransportTransform(input_?
 export declare function jsonCreateMeetingTypeRequestToApplicationTransform(input_?: any): CreateMeetingTypeRequest;
 export declare function jsonMeetingTypeCreatedBodyToTransportTransform(input_?: MeetingTypeCreatedBody | null): any;
 export declare function jsonMeetingTypeCreatedBodyToApplicationTransform(input_?: any): MeetingTypeCreatedBody;
+export declare function jsonSlotsEnvelopeToTransportTransform(input_?: SlotsEnvelope | null): any;
+export declare function jsonSlotsEnvelopeToApplicationTransform(input_?: any): SlotsEnvelope;
+export declare function jsonSlotWindowToTransportTransform(input_?: SlotWindow | null): any;
+export declare function jsonSlotWindowToApplicationTransform(input_?: any): SlotWindow;
+export declare function jsonArraySlotDayToTransportTransform(items_?: Array<SlotDay> | null): any;
+export declare function jsonArraySlotDayToApplicationTransform(items_?: any): Array<SlotDay>;
+export declare function jsonSlotDayToTransportTransform(input_?: SlotDay | null): any;
+export declare function jsonSlotDayToApplicationTransform(input_?: any): SlotDay;
+export declare function jsonArraySlotToTransportTransform(items_?: Array<Slot> | null): any;
+export declare function jsonArraySlotToApplicationTransform(items_?: any): Array<Slot>;
+export declare function jsonSlotToTransportTransform(input_?: Slot | null): any;
+export declare function jsonSlotToApplicationTransform(input_?: any): Slot;

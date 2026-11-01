@@ -81,3 +81,60 @@ export interface CreateMeetingTypeRequest {
 export interface MeetingTypeCreatedBody {
     meetingType: MeetingType;
 }
+/**
+ * Окно записи, часовой пояс владельца и дни с полной сеткой стартов.
+ */
+export interface SlotsEnvelope {
+    window: SlotWindow;
+    /**
+     * Часовая зона владельца: Europe/Moscow.
+     */
+    timezone: string;
+    /**
+     * Ровно 14 дней окна, начиная с сегодняшнего.
+     */
+    days: Array<SlotDay>;
+}
+/**
+ * Границы окна записи в календарных днях владельца.
+ */
+export interface SlotWindow {
+    /**
+     * Первый день окна, YYYY-MM-DD в зоне владельца.
+     */
+    start: string;
+    /**
+     * Последний день окна включительно, YYYY-MM-DD в зоне владельца.
+     */
+    end: string;
+}
+/**
+ * Полная сетка стартов одного календарного дня владельца.
+ */
+export interface SlotDay {
+    /**
+     * Календарный день владельца, YYYY-MM-DD.
+     */
+    date: string;
+    /**
+     * Старты каждые 15 минут с 09:00 по 17:45.
+     */
+    slots: Array<Slot>;
+}
+/**
+ * Старт встречи в сетке слотов.
+ */
+export interface Slot {
+    /**
+     * Мгновение начала в ISO 8601 UTC с суффиксом Z.
+     */
+    start: string;
+    /**
+     * Можно ли записаться на этот старт.
+     */
+    available: boolean;
+}
+/**
+ * Boolean with `true` and `false` values.
+ */
+export type Boolean = boolean;

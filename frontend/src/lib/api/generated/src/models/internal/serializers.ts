@@ -6,6 +6,10 @@ import type {
   MeetingType,
   MeetingTypeCreatedBody,
   MeetingTypeList,
+  Slot,
+  SlotDay,
+  SlotsEnvelope,
+  SlotWindow,
 } from "../models.js";
 
 export function decodeBase64(value: string): Uint8Array | undefined {
@@ -242,5 +246,125 @@ export function decodeBase64(value: string): Uint8Array | undefined {
   }
     return {
     meetingType: jsonMeetingTypeToApplicationTransform(input_.meetingType)
+  }!;
+}export function jsonSlotsEnvelopeToTransportTransform(
+  input_?: SlotsEnvelope | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    window: jsonSlotWindowToTransportTransform(input_.window),timezone: input_.timezone,days: jsonArraySlotDayToTransportTransform(input_.days)
+  }!;
+}export function jsonSlotsEnvelopeToApplicationTransform(
+  input_?: any,
+): SlotsEnvelope {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    window: jsonSlotWindowToApplicationTransform(input_.window),timezone: input_.timezone,days: jsonArraySlotDayToApplicationTransform(input_.days)
+  }!;
+}export function jsonSlotWindowToTransportTransform(
+  input_?: SlotWindow | null,
+): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    start: input_.start,end: input_.end
+  }!;
+}export function jsonSlotWindowToApplicationTransform(
+  input_?: any,
+): SlotWindow {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    start: input_.start,end: input_.end
+  }!;
+}export function jsonArraySlotDayToTransportTransform(
+  items_?: Array<SlotDay> | null,
+): any {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonSlotDayToTransportTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonArraySlotDayToApplicationTransform(
+  items_?: any,
+): Array<SlotDay> {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonSlotDayToApplicationTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonSlotDayToTransportTransform(input_?: SlotDay | null): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    date: input_.date,slots: jsonArraySlotToTransportTransform(input_.slots)
+  }!;
+}export function jsonSlotDayToApplicationTransform(input_?: any): SlotDay {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    date: input_.date,slots: jsonArraySlotToApplicationTransform(input_.slots)
+  }!;
+}export function jsonArraySlotToTransportTransform(
+  items_?: Array<Slot> | null,
+): any {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonSlotToTransportTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonArraySlotToApplicationTransform(
+  items_?: any,
+): Array<Slot> {
+  if(!items_) {
+    return items_ as any;
+  }
+  const _transformedArray = [];
+
+  for (const item of items_ ?? []) {
+    const transformedItem = jsonSlotToApplicationTransform(item as any);
+    _transformedArray.push(transformedItem);
+  }
+
+  return _transformedArray as any;
+}export function jsonSlotToTransportTransform(input_?: Slot | null): any {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    start: input_.start,available: input_.available
+  }!;
+}export function jsonSlotToApplicationTransform(input_?: any): Slot {
+  if(!input_) {
+    return input_ as any;
+  }
+    return {
+    start: input_.start,available: input_.available
   }!;
 }

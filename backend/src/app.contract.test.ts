@@ -83,6 +83,20 @@ function makeApp() {
   return createApp({ store, now: () => new Date("2026-11-01T09:00:00.000Z") });
 }
 
+function makeSlotsApp() {
+  const store = createStore();
+  const meetingType = store.createMeetingType({
+    name: "Кофе с гостем",
+    description: "Короткий разговор о задаче",
+    durationMinutes: 30,
+  });
+
+  return {
+    app: createApp({ store, now: () => new Date("2026-11-01T09:00:00.000Z") }),
+    meetingTypeId: meetingType.id,
+  };
+}
+
 describe("contract compliance", () => {
   it("validates the 200 body of GET /api/meeting-types", async () => {
     const response = await request(makeApp()).get("/api/meeting-types");
@@ -142,5 +156,43 @@ describe("contract compliance", () => {
     const body = { meetingTypes: [{ name: "Кофе с гостем" }] };
 
     await expect(validateResponse("/api/meeting-types", "get", 200, body)).rejects.toThrow();
+  });
+
+  it("validates the 200 body of GET /api/meeting-types/:id/slots", async () => {
+    const { app, meetingTypeId } = makeSlotsApp();
+
+    const response = await request(app).get(`/api/meeting-types/${meetingTypeId}/slots`);
+
+    expect(response.status).toBe(200);
+    await validateResponse("/api/meeting-types/{id}/slots", "get", response.status, response.body);
+  });
+
+  it("validates the 404 body of GET /api/meeting-types/:id/slots", async () => {
+    const { app } = makeSlotsApp();
+
+    const response = await request(app).get("/api/meeting-types/missing/slots");
+
+    expect(response.status).toBe(404);
+    await validateResponse("/api/meeting-types/{id}/slots", "get", response.status, response.body);
+  });
+
+  it("rejects an extra field inside a slot, so nested sealed schemas are enforced", async () => {
+    const { app, meetingTypeId } = makeSlotsApp();
+
+    const response = await request(app).get(`/api/meeting-types/${meetingTypeId}/slots`);
+    const body = structuredClone(response.body) as {
+      days: { slots: Record<string, unknown>[] }[];
+    };
+    const firstSlot = body.days[0]?.slots[0];
+
+    if (firstSlot === undefined) {
+      throw new Error("The slots response has no first slot");
+    }
+
+    firstSlot.extra = true;
+
+    await expect(
+      validateResponse("/api/meeting-types/{id}/slots", "get", 200, body),
+    ).rejects.toThrow();
   });
 });
