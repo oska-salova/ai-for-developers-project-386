@@ -13,6 +13,7 @@
 - `mise run fix` — безопасные автоисправления; `mise run test` — оба набора тестов; `mise run security` — osv-scanner, история git, online-правила workflows (медленно, есть в CI по расписанию).
 - `mise run contract:build` — генерация OpenAPI, SDK и бэкенд-типов из TypeSpec; `mise run contract:check` повторяет генерацию и падает на дрейфе (включая новые файлы).
 - `mise run e2e` — сборка фронтенда, Playwright на Chromium и запуск бэкенда `dev:seeded`. В `mise run check` не входит: гейт должен оставаться быстрым, e2e живёт в `verify`. Перед первым запуском локально: `mise exec -- pnpm --dir frontend exec playwright install chromium`.
+- Docker: `docker build -t call-calendar .`, затем `docker run --rm -e PORT=8080 -p 8080:8080 call-calendar`. Наружу открыт только `PORT`; внутри Next.js проксирует `/api` и `/health` в Express на 3001.
 - Точечная проверка без прогона всего: `mise exec -- pnpm --dir backend test src/app.test.ts`, `mise exec -- pnpm --dir frontend test -- -t "часть названия"`, `mise exec -- hk run pre-push --all`.
 - Хуки: pre-commit — быстрые шаги по изменённым файлам, pre-push — весь набор `hk`. Хук можно обойти `--no-verify`, но CI запускает `mise run check`, так что обход бесполезен.
 
@@ -20,6 +21,7 @@
 
 - Это три независимых пакета (`backend`, `frontend`, `contract`), общего pnpm-workspace и корневого `package.json` нет: команды выполнять с `--dir <пакет>`, у каждого свой lockfile. `backend/pnpm-workspace.yaml` и `contract/pnpm-workspace.yaml` — не workspace, а место, где pnpm 12 читает настройки пакета (`onlyBuiltDependencies`, `overrides`).
 - Порты: фронтенд 3000 (`next dev`/`next start`), бэкенд 3001 (`PORT`, по умолчанию 3001). CORS разрешает только `http://localhost:3000`; переопределяется `CORS_ORIGIN`.
+- `Dockerfile` в корне собирает один образ: Next.js (standalone) слушает внешний `PORT`, Express — внутренний 3001. Порт 3001 зашит в `frontend/next.config.ts` (rewrites `/api` и `/health`) и `docker-entrypoint.sh`; меняйте его в обоих местах вместе с `DEFAULT_SERVER_API_URL` в `frontend/src/lib/api.ts`.
 - `backend/src/app.ts` экспортирует `createApp({ store, now })` (middleware + роуты), `backend/src/index.ts` создаёт пустое хранилище и системные часы и слушает порт. Новые роуты добавлять в `app.ts` и описывать в TypeSpec.
 - Бэкенд — ESM + `moduleResolution: nodenext`: в относительных импортах обязательны `.js` (`import { createApp } from './app.js'`). Это нужно для собранного `dist/`; `tsx` в dev резолвит их в `.ts`.
 - `pnpm dev` в бэкенде запускает `tsx watch src/index.ts`, `pnpm dev:seeded` — `tsx src/dev-seeded.ts` с наполненным хранилищем. Node type stripping для этого не используется: он не резолвит `.js`-импорты в `.ts`.

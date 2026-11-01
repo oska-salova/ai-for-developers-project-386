@@ -12,8 +12,8 @@ import {
 
 export type { Meeting, MeetingType, SlotDay, SlotsEnvelope };
 
-/** Where the SDK talks to the backend when NEXT_PUBLIC_API_URL is not set. */
-const DEFAULT_API_URL = "http://localhost:3001";
+/** Where the Next.js server reaches the backend when NEXT_PUBLIC_API_URL is not set. */
+const DEFAULT_SERVER_API_URL = "http://127.0.0.1:3001";
 
 /** An error the API reported inside its `{ error }` envelope. */
 export class ApiError extends Error {
@@ -28,8 +28,23 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * In the browser the API lives on the page origin: the Next.js server proxies
+ * `/api` to Express, so a deployed container needs only one public port.
+ * During server rendering the proxy is bypassed with the internal address.
+ */
+function defaultApiUrl(): string {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+
+  return process.env.API_URL ?? DEFAULT_SERVER_API_URL;
+}
+
 export function resolveApiUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_URL;
+  const configured = process.env.NEXT_PUBLIC_API_URL;
+
+  return configured ? configured : defaultApiUrl();
 }
 
 interface ApiClientOptions {

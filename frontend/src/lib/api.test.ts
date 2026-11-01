@@ -27,12 +27,21 @@ function fakeHttpClient(body: unknown, status = 200) {
 describe("API client configuration", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
-  it("defaults to the local backend", () => {
+  it("defaults to the page origin in the browser", () => {
     vi.stubEnv("NEXT_PUBLIC_API_URL", undefined);
 
-    expect(resolveApiUrl()).toBe("http://localhost:3001");
+    expect(resolveApiUrl()).toBe(window.location.origin);
+  });
+
+  it("defaults to the internal backend during server rendering", () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", undefined);
+    vi.stubEnv("API_URL", undefined);
+    vi.stubGlobal("window", undefined);
+
+    expect(resolveApiUrl()).toBe("http://127.0.0.1:3001");
   });
 
   it("reads the base URL from NEXT_PUBLIC_API_URL", () => {

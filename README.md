@@ -31,9 +31,26 @@ mise exec -- pnpm --dir backend dev:seeded   # с типом встречи «К
 mise exec -- pnpm --dir frontend dev
 ```
 
-Фронтенд — http://localhost:3000, бэкенд — http://localhost:3001. `NEXT_PUBLIC_API_URL`
-переопределяет адрес API (по умолчанию `http://localhost:3001`), `CORS_ORIGIN` — разрешённый
+Фронтенд — http://localhost:3000, бэкенд — http://localhost:3001. В браузере запросы к API
+идут на origin страницы: Next проксирует `/api` в бэкенд. Серверные компоненты обращаются к
+`http://127.0.0.1:3001`; адрес переопределяется `API_URL`. `NEXT_PUBLIC_API_URL` (build-time)
+задаёт внешний адрес API, если бэкенд живёт на другом origin, `CORS_ORIGIN` — разрешённый
 origin фронтенда.
+
+## Docker
+
+Образ собирает обе части приложения и запускает их в одном контейнере. Наружу открыт только
+порт из переменной `PORT` (по умолчанию `3000`):
+
+```bash
+docker build -t call-calendar .
+docker run --rm -e PORT=8080 -p 8080:8080 call-calendar
+```
+
+Приложение будет доступно на http://localhost:8080. Next.js отдаёт интерфейс и проксирует
+`/api` и `/health` во внутренний Express на порту 3001. `PORT` используется при деплое и в
+автоматической проверке проекта; `NEXT_PUBLIC_API_URL` можно передать на сборке через
+`--build-arg`, если API должен быть на отдельном публичном адресе.
 
 Контракт API описан на TypeSpec в `contract/`: `mise run contract:build` генерирует OpenAPI,
 SDK и типы бэкенда, `mise run contract:check` проверяет, что сгенерированное закоммичено.
