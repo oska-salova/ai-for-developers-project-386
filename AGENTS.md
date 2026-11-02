@@ -22,7 +22,7 @@
 ## Устройство и ловушки
 
 - Бэкенд — ESM + `moduleResolution: nodenext`: в относительных импортах обязательны `.js` (`import { createApp } from './app.js'`), это нужно собранному `dist/`.
-- `backend/src/app.ts` экспортирует `createApp({ store, now })` (middleware + роуты), `backend/src/index.ts` создаёт пустое хранилище и системные часы. Новые роуты — в `app.ts` и в TypeSpec.
+- `backend/src/app.ts` экспортирует `createApp({ store, now })` (middleware + роуты), `backend/src/index.ts` создаёт хранилище, сеет в него тип встречи «Знакомство» и подключает системные часы. Новые роуты — в `app.ts` и в TypeSpec.
 - Порт 3001 зашит в `frontend/next.config.ts` (rewrites `/api` и `/health`), `docker-entrypoint.sh` и `DEFAULT_SERVER_API_URL` в `frontend/src/lib/api.ts` — меняйте его в этих местах вместе.
 - Тёмная тема — класс `.dark` на `<html>` (shadcn), а не `prefers-color-scheme`.
 - Включён `cacheComponents`: `new Date()`, `Math.random()` и `crypto.randomUUID()` в серверных компонентах ломают пререндер при `next build`. Время фиксируйте через `env` в `next.config.ts` (пример — `NEXT_PUBLIC_BUILD_YEAR`) или рендерите участок по запросу в `<Suspense>` с `await connection()`.
@@ -40,7 +40,7 @@
 
 - Бэкенд: HTTP-контракт через supertest и `createApp` с фиксированными часами и свежим хранилищем; `backend/src/app.contract.test.ts` валидирует реальные ответы (код и тело) по `contract/openapi/openapi.json`.
 - Фронтенд: тесты рядом с кодом; маршрутные тесты, проверяющие несколько страниц сразу, — в `src/app/`.
-- E2E: `frontend/e2e` (`*.spec.ts`), только Chromium, против production-сборки и бэкенда `dev:seeded` на 3001; спеки исключены из Vitest.
+- E2E: `frontend/e2e` (`*.spec.ts`), только Chromium, против production-сборки и бэкенда `dev` на 3001; спеки исключены из Vitest.
 
 ## Линтеры и форматтер
 

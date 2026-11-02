@@ -14,9 +14,9 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [
     {
-      // The real backend the pages call. Seeded so the owner list has data;
-      // the booking scenario in a later ticket reuses this server.
-      command: "pnpm --dir ../backend dev:seeded",
+      // The real backend the pages call, started the way a developer starts it:
+      // it comes up with the default meeting type the booking scenario uses.
+      command: "pnpm --dir ../backend dev",
       url: "http://localhost:3001/health",
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
